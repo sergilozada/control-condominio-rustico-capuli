@@ -1,0 +1,586 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    min-width: 320px;
+    font-size: 14px;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (max-width: 767px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
+  :root {
+    --background: 50 19% 94%;
+    --foreground: 222 36% 15%;
+
+    --card: 45 100% 99%;
+    --card-foreground: 220 57% 19%;
+
+    --popover: 45 100% 99%;
+    --popover-foreground: 220 57% 19%;
+
+    --primary: 185 80% 26%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 169 49% 93%;
+    --secondary-foreground: 220 57% 19%;
+
+    --muted: 50 23% 95%;
+    --muted-foreground: 219 12% 47%;
+
+    --accent: 169 49% 93%;
+    --accent-foreground: 185 80% 26%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 120 6% 86%;
+    --input: 120 6% 86%;
+    --ring: 185 77% 34%;
+
+    --radius: 0.875rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@keyframes vh-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vh-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vh-fade-right {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vh-hero-focus {
+  from {
+    opacity: 0.72;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vh-menu-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@layer utilities {
+  .vh-dashboard-shell {
+    max-width: 100vw;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 92% 4%, rgb(20 142 152 / 7%), transparent 26rem),
+      radial-gradient(circle at 5% 92%, rgb(201 162 77 / 6%), transparent 24rem);
+  }
+
+  .vh-header-enter {
+    animation: vh-fade-down 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-sidebar-enter {
+    animation: vh-fade-right 440ms 70ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-login-shell-enter {
+    animation: vh-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-login-visual-enter {
+    animation: vh-fade-right 600ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-login-form-enter {
+    animation: vh-fade-up 480ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-tab-enter,
+  .vh-hero-enter,
+  .vh-stat-enter,
+  .vh-panel-enter,
+  .vh-soft-enter {
+    animation: vh-fade-up 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-hero-image {
+    animation: vh-hero-focus 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-primary-action {
+    transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  }
+
+  .vh-primary-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgb(7 22 40 / 28%);
+  }
+
+  .vh-primary-action:active {
+    transform: translateY(0) scale(0.985);
+  }
+
+  .vh-menu-icon {
+    display: inline-flex;
+    width: 20px;
+    height: 16px;
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .vh-menu-bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: #54317f;
+    transform-origin: center;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 160ms ease;
+  }
+
+  .vh-menu-button[data-open="true"] .vh-menu-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .vh-menu-button[data-open="true"] .vh-menu-bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.45);
+  }
+
+  .vh-menu-button[data-open="true"] .vh-menu-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .vh-mobile-menu {
+    animation: vh-menu-reveal 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: top left;
+  }
+
+  .vh-client-table-shell > div {
+    overflow-x: auto;
+  }
+
+  .vh-spaced-table {
+    table-layout: auto;
+    min-width: 1120px;
+  }
+
+  .vh-debt-table {
+    min-width: 920px;
+  }
+
+  .vh-spaced-table th,
+  .vh-spaced-table td {
+    min-width: 0;
+    padding-right: 0.875rem !important;
+    padding-left: 0.875rem !important;
+    line-height: 1.4;
+  }
+
+  .vh-spaced-table th {
+    white-space: nowrap;
+  }
+
+  .vh-spaced-table .inline-flex {
+    width: max-content;
+    min-width: max-content;
+    white-space: nowrap;
+  }
+
+  .vh-client-table th:nth-child(1),
+  .vh-client-table td:nth-child(1) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(2),
+  .vh-client-table td:nth-child(2) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(3),
+  .vh-client-table td:nth-child(3) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(4),
+  .vh-client-table td:nth-child(4) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(5),
+  .vh-client-table td:nth-child(5) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(6),
+  .vh-client-table td:nth-child(6) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(7),
+  .vh-client-table td:nth-child(7) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(8),
+  .vh-client-table td:nth-child(8) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(9),
+  .vh-client-table td:nth-child(9),
+  .vh-client-table th:nth-child(11),
+  .vh-client-table td:nth-child(11) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(10),
+  .vh-client-table td:nth-child(10) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:nth-child(12),
+  .vh-client-table td:nth-child(12),
+  .vh-client-table th:nth-child(13),
+  .vh-client-table td:nth-child(13) {
+    min-width: 0;
+  }
+
+  .vh-client-table th:last-child,
+  .vh-client-table td:last-child {
+    min-width: 0;
+  }
+
+  .vh-debt-table th:nth-child(1),
+  .vh-debt-table td:nth-child(1) {
+    min-width: 150px;
+  }
+
+  .vh-debt-table th:nth-child(2),
+  .vh-debt-table td:nth-child(2) {
+    min-width: 88px;
+  }
+
+  .vh-debt-table th:nth-child(5),
+  .vh-debt-table td:nth-child(5) {
+    min-width: 110px;
+  }
+
+  .vh-debt-table th:nth-child(6),
+  .vh-debt-table td:nth-child(6) {
+    min-width: 175px;
+  }
+
+  .vh-debt-table th:nth-child(7),
+  .vh-debt-table td:nth-child(7) {
+    min-width: 110px;
+  }
+
+  .vh-debt-table th:nth-child(8),
+  .vh-debt-table td:nth-child(8) {
+    min-width: 145px;
+  }
+
+  .vh-client-table td:nth-child(2) {
+    overflow-wrap: anywhere;
+  }
+
+  .vh-client-table td:nth-child(5),
+  .vh-debt-table td:nth-child(6) {
+    overflow-wrap: anywhere;
+  }
+
+  .vh-spaced-table td:last-child > div {
+    gap: 0.5rem;
+  }
+
+  .vh-client-table {
+    min-width: 1380px;
+    table-layout: fixed;
+  }
+
+  .vh-client-table th,
+  .vh-client-table td {
+    min-width: 0 !important;
+    padding-right: 0.375rem !important;
+    padding-left: 0.375rem !important;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .vh-client-table .inline-flex {
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vh-header-enter,
+  .vh-sidebar-enter,
+  .vh-login-shell-enter,
+  .vh-login-visual-enter,
+  .vh-login-form-enter,
+  .vh-tab-enter,
+  .vh-hero-enter,
+  .vh-stat-enter,
+  .vh-panel-enter,
+  .vh-soft-enter,
+  .vh-hero-image {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .vh-primary-action,
+  .vh-primary-action:hover,
+  .vh-primary-action:active {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .vh-menu-bar {
+    transition: none !important;
+  }
+
+  .vh-mobile-menu {
+    animation: none !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.45;
+    min-width: 320px;
+  }
+
+  .brand-display {
+    font-family: Georgia, "Times New Roman", ui-serif, serif;
+  }
+
+  ::selection {
+    background: #ccebe6;
+    color: #33204f;
+  }
+}
+
+/* Identidad visual de Condominio Rústico Capulí. */
+.capuli-design.vh-dashboard-shell {
+  background: #f7f3eb !important;
+  background-image: radial-gradient(circle at 90% 5%, rgb(255 158 50 / 13%), transparent 26rem) !important;
+}
+
+.capuli-design .vh-header-enter {
+  border-color: #284618 !important;
+  background: #203814 !important;
+}
+
+.capuli-design .vh-header-enter p,
+.capuli-design .vh-header-enter button[aria-label="Cerrar sesión"] {
+  color: #fff !important;
+}
+
+.capuli-design .vh-header-enter button[aria-label="Cerrar sesión"] {
+  border-color: #6c874c !important;
+  background: #31521d !important;
+}
+
+.capuli-design .vh-header-enter span.rounded-full {
+  border-color: #6c874c !important;
+  background: #31521d !important;
+  color: #fff !important;
+}
+
+.capuli-design .vh-sidebar-enter {
+  border-color: #31521d !important;
+  background: #284618 !important;
+  box-shadow: 8px 0 28px rgb(32 56 20 / 12%);
+}
+
+.capuli-design .vh-menu-button {
+  border-color: #6c874c !important;
+  background: #31521d !important;
+  color: #fff !important;
+}
+
+.capuli-design .vh-menu-button span,
+.capuli-design .vh-menu-button .vh-menu-bar {
+  color: #fff !important;
+}
+
+.capuli-design .vh-menu-button .vh-menu-bar {
+  background: #d9bc3f !important;
+}
+
+.capuli-design #dashboard-navigation [role="tab"] {
+  color: #f2e9fa !important;
+}
+
+.capuli-design #dashboard-navigation [role="tab"] span {
+  color: #dce8d3 !important;
+}
+
+.capuli-design #dashboard-navigation [role="tab"]:hover {
+  background: #3a6124 !important;
+}
+
+.capuli-design #dashboard-navigation [role="tab"][data-state="active"] {
+  border-color: #ead568 !important;
+  background: #d9bc3f !important;
+  color: #203814 !important;
+  font-weight: 700;
+}
+
+.capuli-design #dashboard-navigation [role="tab"][data-state="active"] span {
+  color: #203814 !important;
+}
+
+.capuli-design .vh-hero-enter {
+  border: 1px solid #58753a;
+  background: linear-gradient(112deg, #203814 0%, #31521d 60%, #5d6e20 100%) !important;
+  box-shadow: 0 18px 35px rgb(32 56 20 / 20%);
+}
+
+.capuli-design .vh-hero-enter > img,
+.capuli-design .vh-hero-enter > div.absolute.inset-0 {
+  display: none;
+}
+
+.capuli-design .vh-hero-enter::before {
+  content: "";
+  position: absolute;
+  right: -7rem;
+  top: -10rem;
+  width: 27rem;
+  height: 27rem;
+  border: 4rem solid rgb(255 255 255 / 10%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.capuli-design .vh-hero-enter .vh-primary-action {
+  background: #d9bc3f !important;
+  color: #203814 !important;
+  box-shadow: 0 9px 22px rgb(42 22 53 / 15%);
+}
+
+.capuli-design .vh-stat-enter {
+  border-color: #ece3d7 !important;
+  border-radius: 1.5rem !important;
+  background: #fffdf9 !important;
+  box-shadow: 0 8px 24px rgb(49 34 59 / 7%);
+}
+
+.capuli-design .vh-panel-enter {
+  border-color: #ece3d7 !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 24px rgb(49 34 59 / 6%);
+}
+
+@media (max-width: 1023px) {
+  .capuli-design .vh-sidebar-enter {
+    box-shadow: none;
+  }
+}

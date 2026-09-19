@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function active() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && profile().active == true;
+    }
+    function admin() { return active() && profile().role == 'admin'; }
+    function legal() { return active() && profile().role in ['admin', 'legal']; }
+    function payments() { return active() && profile().role in ['admin', 'pagos']; }
+    function receipts() { return active() && profile().role in ['admin', 'boletas']; }
+    function auditMatches(clientId, action, auditId) {
+      let path = /databases/$(database)/documents/auditLogs/$(auditId);
+      return auditId is string && existsAfter(path)
+        && getAfter(path).data.actorUid == request.auth.uid
+        && getAfter(path).data.clientId == clientId
+        && getAfter(path).data.action == action
+        && getAfter(path).data.createdAt == request.time;
+    }
+    function minuteAuditMatches(minuteId, clientId, action, auditId) {
+      let path = /databases/$(database)/documents/auditLogs/$(auditId);
+      return auditId is string && existsAfter(path)
+        && getAfter(path).data.actorUid == request.auth.uid
+        && getAfter(path).data.minuteId == minuteId
+        && getAfter(path).data.clientId == clientId
+        && getAfter(path).data.action == action
+        && getAfter(path).data.createdAt == request.time;
+    }
+    function quotaChange(clientId, action, allowedFields) {
+      let auditId = request.resource.data.lastAuditId;
+      let audit = getAfter(/databases/$(database)/documents/auditLogs/$(auditId)).data;
+      let index = audit.quotaIndex;
+      let before = resource.data.cuotas[index];
+      let after = request.resource.data.cuotas[index];
+      return auditMatches(clientId, action, auditId)
+        && index is int && index >= 0 && index < resource.data.cuotas.size()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cuotas', 'lastAuditId'])
+        && request.resource.data.cuotas.size() == resource.data.cuotas.size()
+        && after.numero == before.numero
+        && after.diff(before).affectedKeys().hasOnly(allowedFields)
+        && request.resource.data.cuotas.removeAll([after]) == resource.data.cuotas.removeAll([before]);
+    }
+    match /users/{uid} {
+      allow get: if admin() || (active() && request.auth.uid == uid);
+      allow list: if admin();
+      allow create, update, delete: if admin();
+    }
+    match /clients/{clientId} {
+      allow get, list: if active();
+      allow create: if admin() && request.resource.data.userId == request.auth.uid
+        && auditMatches(clientId, 'crear', request.resource.data.lastAuditId);
+      allow update: if active() &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.lastAuditId != resource.data.lastAuditId &&
+        (
+          (admin() && auditMatches(clientId, 'actualizar', request.resource.data.lastAuditId))
+          || (legal()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastDocumentEvent', 'lastAuditId'])
+            && auditMatches(clientId, 'minuta_documento', request.resource.data.lastAuditId))
+          || (payments() && quotaChange(clientId, 'pago_registrar', ['estado', 'fechaPago'])
+            && resource.data.cuotas[getAfter(/databases/$(database)/documents/auditLogs/$(request.resource.data.lastAuditId)).data.quotaIndex].estado != 'pagado'
+            && request.resource.data.cuotas[getAfter(/databases/$(database)/documents/auditLogs/$(request.resource.data.lastAuditId)).data.quotaIndex].estado == 'pagado')
+          || (payments() && quotaChange(clientId, 'voucher_actualizar', ['voucher']))
+          || (receipts() && quotaChange(clientId, 'boleta_actualizar', ['boleta']))
+        );
+      allow delete: if admin();
+    }
+    match /minutes/{minuteId} {
+      allow get, list: if legal();
+      allow create: if legal()
+        && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientId))
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.status == 'borrador'
+        && minuteAuditMatches(minuteId, request.resource.data.clientId, 'minuta_crear', request.resource.data.lastAuditId);
+      allow update: if legal()
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.lastAuditId != resource.data.lastAuditId
+        && (
+          minuteAuditMatches(minuteId, resource.data.clientId, 'minuta_actualizar', request.resource.data.lastAuditId)
+          || (request.resource.data.status == 'generada'
+            && minuteAuditMatches(minuteId, resource.data.clientId, 'minuta_generar', request.resource.data.lastAuditId))
+        );
+      allow delete: if false;
+    }
+    match /auditLogs/{auditId} {
+      allow get, list: if admin();
+      allow create: if active()
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorEmail == request.auth.token.email
+        && request.resource.data.clientId is string
+        && request.resource.data.action in ['crear', 'actualizar', 'eliminar', 'minuta_documento', 'pago_registrar', 'voucher_actualizar', 'boleta_actualizar', 'minuta_crear', 'minuta_actualizar', 'minuta_generar']
+        && request.resource.data.fields is list
+        && request.resource.data.createdAt == request.time
+        && (
+          (request.resource.data.action == 'eliminar' && admin()
+            && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientId))
+            && !existsAfter(/databases/$(database)/documents/clients/$(request.resource.data.clientId)))
+          || (request.resource.data.action in ['crear', 'actualizar', 'minuta_documento', 'pago_registrar', 'voucher_actualizar', 'boleta_actualizar']
+            && (request.resource.data.action in ['crear', 'actualizar'] ? admin()
+              : request.resource.data.action == 'minuta_documento' ? legal()
+              : request.resource.data.action == 'boleta_actualizar' ? receipts() : payments())
+            && existsAfter(/databases/$(database)/documents/clients/$(request.resource.data.clientId))
+            && getAfter(/databases/$(database)/documents/clients/$(request.resource.data.clientId)).data.lastAuditId == auditId)
+          || (request.resource.data.action in ['minuta_crear', 'minuta_actualizar', 'minuta_generar']
+            && legal()
+            && request.resource.data.minuteId is string
+            && existsAfter(/databases/$(database)/documents/minutes/$(request.resource.data.minuteId))
+            && getAfter(/databases/$(database)/documents/minutes/$(request.resource.data.minuteId)).data.lastAuditId == auditId
+            && getAfter(/databases/$(database)/documents/minutes/$(request.resource.data.minuteId)).data.clientId == request.resource.data.clientId)
+        );
+      allow update, delete: if false;
+    }
+  }
+}

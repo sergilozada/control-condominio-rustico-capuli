@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function profile() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+    function active() {
+      return request.auth != null &&
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        profile().active == true;
+    }
+    function admin() { return active() && profile().role == 'admin'; }
+    function legal() { return active() && profile().role == 'legal'; }
+    function payments() { return active() && profile().role == 'pagos'; }
+    function receipts() { return active() && profile().role == 'boletas'; }
+    match /clients/{clientId}/cuotas/{quotaIndex}/{fileType}/{fileName} {
+      allow read: if active() && firestore.exists(/databases/(default)/documents/clients/$(clientId));
+      allow write: if firestore.exists(/databases/(default)/documents/clients/$(clientId))
+        && (admin() || (fileType == 'voucher' && payments()) || (fileType == 'boleta' && receipts()));
+    }
+    match /clients/{clientId}/minutas/{fileName} {
+      allow read: if firestore.exists(/databases/(default)/documents/clients/$(clientId))
+        && (admin() || legal());
+      allow write: if firestore.exists(/databases/(default)/documents/clients/$(clientId))
+        && (admin() || legal());
+    }
+    match /clients/{clientId}/{allPaths=**} {
+      allow read, delete: if admin();
+      allow create, update: if admin() && firestore.exists(/databases/(default)/documents/clients/$(clientId));
+    }
+  }
+}

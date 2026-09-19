@@ -36,7 +36,7 @@ pnpm build
 
 ## Firebase
 
-La configuración detallada está en [FIREBASE_SETUP.md](./FIREBASE_SETUP.md). El ID sugerido es `control-rustico-capuli`, siempre que siga disponible.
+La configuración detallada está en [FIREBASE_SETUP.md](./FIREBASE_SETUP.md). El proyecto activo es `controlcondominiorusticocapuli`; Firebase no admite espacios y limita el ID a 30 caracteres.
 
 No se debe copiar `.env.local` desde Villa Hermosa o San Bartolomeo. `.env.local`, `node_modules`, `.firebase` y `dist` están excluidos de Git.
 

@@ -15,7 +15,7 @@ export const isFirebaseConfigured = required.every(key => Boolean(import.meta.en
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'PENDING_SETUP',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'pending.invalid',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'pending-control-rustico-capuli',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'pending-controlcondominiorusticocapuli',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'pending.invalid',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '0',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || 'pending-setup',

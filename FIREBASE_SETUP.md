@@ -5,9 +5,9 @@ Se recomienda un proyecto Firebase nuevo. No conviene usar el de Villa Hermosa n
 ## 1. Crear el proyecto
 
 1. Entra a `https://console.firebase.google.com/` con la cuenta propietaria.
-2. Crea un proyecto nuevo. Usa `control-rustico-capuli` como ID si está disponible; el ID no puede cambiarse después.
+2. El proyecto creado usa `controlcondominiorusticocapuli`: contiene el nombre completo y ocupa los 30 caracteres máximos permitidos por Firebase.
 3. Google Analytics es opcional para este control administrativo.
-4. En Configuración del proyecto → Tus apps, agrega una aplicación Web llamada `Control Capulí`.
+4. En Configuración del proyecto → Tus apps, agrega una aplicación Web llamada `Control Condominio Rustico Capuli`.
 5. Copia los seis valores del objeto `firebaseConfig`.
 
 ## 2. Conectar la aplicación local
@@ -65,7 +65,7 @@ Selecciona solamente el proyecto nuevo de Capulí y usa el alias `default`. Lueg
 Publica:
 
 ```powershell
-firebase deploy --only firestore:rules,storage,hosting --project control-rustico-capuli
+firebase deploy --only firestore:rules,storage,hosting --project controlcondominiorusticocapuli
 ```
 
 Si elegiste otro ID, reemplázalo en el comando y en `.firebaserc`.

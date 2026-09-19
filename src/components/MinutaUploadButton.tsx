@@ -168,7 +168,7 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
         <Button
           size="sm"
           variant="outline"
-          className="border-[#bfe4df] bg-[#f2ebf7] text-[#54317f] hover:bg-[#d9f0ec] hover:text-[#54317f]"
+          className="border-[#d4ddc4] bg-[#f8f5eb] text-[#2f4817] hover:bg-[#edf0e5] hover:text-[#2f4817]"
           aria-label={`Gestionar minuta de ${clientName}`}
         >
           <Upload className="h-4 w-4" />
@@ -176,19 +176,19 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#d9ddd9] bg-[#fffefb] p-0 sm:max-w-xl">
-        <DialogHeader className="border-b border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-5 text-left">
-          <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#54317f] text-white shadow-sm">
+      <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#dfe3d8] bg-[#fffefa] p-0 sm:max-w-xl">
+        <DialogHeader className="border-b border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-5 text-left">
+          <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#2f4817] text-white shadow-sm">
             <FileText className="h-5 w-5" />
           </div>
-          <DialogTitle className="text-xl text-[#33204f]">Minuta del cliente</DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-[#697386]">
+          <DialogTitle className="text-xl text-[#17250c]">Minuta del cliente</DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-[#667060]">
             {clientName}. Adjunta documentos PDF o Word sin modificar la información del cliente.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 px-6 py-5">
-          {onCreate && <Button type="button" className="w-full bg-[#54317f] text-white" onClick={() => { setOpen(false); onCreate(clientId); }}>
+          {onCreate && <Button type="button" className="w-full bg-[#2f4817] text-white" onClick={() => { setOpen(false); onCreate(clientId); }}>
             Crear borrador de minuta para este cliente
           </Button>}
           <input
@@ -203,33 +203,33 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="flex min-h-32 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#7bc7c5] bg-[#f2ebf7]/70 px-5 py-6 text-center transition-colors hover:border-[#5c3585] hover:bg-[#dff2ef] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5c3585] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-h-32 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#aab38b] bg-[#f8f5eb]/70 px-5 py-6 text-center transition-colors hover:border-[#3c5a20] hover:bg-[#eef1e6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3c5a20] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {uploading ? (
-              <Loader2 className="mb-3 h-7 w-7 animate-spin text-[#54317f]" />
+              <Loader2 className="mb-3 h-7 w-7 animate-spin text-[#2f4817]" />
             ) : (
-              <Upload className="mb-3 h-7 w-7 text-[#54317f]" />
+              <Upload className="mb-3 h-7 w-7 text-[#2f4817]" />
             )}
-            <span className="font-semibold text-[#33204f]">
+            <span className="font-semibold text-[#17250c]">
               {uploading ? 'Subiendo minuta…' : 'Seleccionar minuta'}
             </span>
-            <span className="mt-1 text-sm text-[#697386]">PDF, DOC o DOCX · máximo 15 MB</span>
+            <span className="mt-1 text-sm text-[#667060]">PDF, DOC o DOCX · máximo 15 MB</span>
           </button>}
 
           <section aria-labelledby={`minutes-${clientId}`}>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 id={`minutes-${clientId}`} className="text-sm font-semibold text-[#33204f]">
+              <h3 id={`minutes-${clientId}`} className="text-sm font-semibold text-[#17250c]">
                 Documentos disponibles
               </h3>
               {!loading && (
-                <span className="rounded-full bg-[#eef7f5] px-2.5 py-1 text-xs font-medium text-[#54317f]">
+                <span className="rounded-full bg-[#eef1e6] px-2.5 py-1 text-xs font-medium text-[#2f4817]">
                   {minutes.length}
                 </span>
               )}
             </div>
 
             {loading ? (
-              <div className="flex items-center gap-2 rounded-xl bg-[#f5f4ef] p-4 text-sm text-[#697386]">
+              <div className="flex items-center gap-2 rounded-xl bg-[#f8f5eb] p-4 text-sm text-[#667060]">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Consultando documentos…
               </div>
@@ -238,20 +238,20 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
                 {minutes.map((minute) => (
                   <div
                     key={minute.path}
-                    className="group flex min-h-14 items-center gap-2 rounded-xl border border-[#d9ddd9] bg-white p-1.5 transition-colors hover:border-[#bfe4df] hover:bg-[#f2ebf7]/40"
+                    className="group flex min-h-14 items-center gap-2 rounded-xl border border-[#dfe3d8] bg-white p-1.5 transition-colors hover:border-[#d4ddc4] hover:bg-[#f8f5eb]/40"
                   >
                     <a
                       href={minute.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5c3585]"
+                      className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3c5a20]"
                       aria-label={`Abrir minuta ${minute.name}`}
                     >
                       <FileCheck2 className="h-5 w-5 shrink-0 text-emerald-600" />
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#182033]">
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#172012]">
                         {minute.name}
                       </span>
-                      <ExternalLink className="h-4 w-4 shrink-0 text-[#9aa29a] group-hover:text-[#5c3585]" />
+                      <ExternalLink className="h-4 w-4 shrink-0 text-[#aab38b] group-hover:text-[#3c5a20]" />
                     </a>
                     {canManageMinutes(user?.role) && <Button
                       type="button"
@@ -268,14 +268,14 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-[#d9ddd9] bg-[#f5f4ef] px-4 py-5 text-center text-sm text-[#697386]">
+              <div className="rounded-xl border border-[#dfe3d8] bg-[#f8f5eb] px-4 py-5 text-center text-sm text-[#667060]">
                 Aún no hay minutas cargadas para este cliente.
               </div>
             )}
           </section>
         </div>
 
-        <DialogFooter className="border-t border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-4">
+        <DialogFooter className="border-t border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-4">
           <Button variant="outline" onClick={() => setOpen(false)}>Cerrar</Button>
         </DialogFooter>
       </DialogContent>
@@ -283,13 +283,13 @@ export default function MinutaUploadButton({ clientId, clientName, onCreate }: M
       <AlertDialog open={minuteToDelete !== null} onOpenChange={nextOpen => {
         if (!nextOpen && !deleting) setMinuteToDelete(null);
       }}>
-        <AlertDialogContent className="w-[calc(100vw-2rem)] rounded-2xl border-[#d9ddd9] bg-[#fffefb] sm:max-w-md">
+        <AlertDialogContent className="w-[calc(100vw-2rem)] rounded-2xl border-[#dfe3d8] bg-[#fffefa] sm:max-w-md">
           <AlertDialogHeader>
             <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-[#a63d45] sm:mx-0">
               <Trash2 className="h-5 w-5" />
             </div>
-            <AlertDialogTitle className="text-[#33204f]">¿Eliminar esta minuta?</AlertDialogTitle>
-            <AlertDialogDescription className="leading-6 text-[#697386]">
+            <AlertDialogTitle className="text-[#17250c]">¿Eliminar esta minuta?</AlertDialogTitle>
+            <AlertDialogDescription className="leading-6 text-[#667060]">
               {minuteToDelete?.name}. El documento se eliminará del almacenamiento y esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>

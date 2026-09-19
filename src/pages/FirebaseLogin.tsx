@@ -86,32 +86,34 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
   };
 
   return (
-    <main className="vh-login-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-[#203814] p-3 sm:px-6 sm:py-3">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(20,142,152,0.28),transparent_30%),radial-gradient(circle_at_90%_90%,rgba(201,162,77,0.18),transparent_26%)]" aria-hidden="true" />
+    <main className="vh-login-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-[#17250c] p-3 sm:px-6 sm:py-3">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(196,154,34,0.18),transparent_30%),radial-gradient(circle_at_90%_90%,rgba(102,114,59,0.24),transparent_26%)]" aria-hidden="true" />
 
-      <div className="vh-login-shell-enter relative grid w-full max-w-6xl overflow-hidden rounded-[26px] border border-white/15 bg-[#fffefb] shadow-[0_38px_110px_rgba(0,8,24,0.46)] lg:min-h-[680px] lg:grid-cols-[1.12fr_0.88fr]">
+      <div className="vh-login-shell-enter relative grid w-full max-w-6xl overflow-hidden rounded-[26px] border border-white/15 bg-[#fffefa] shadow-[0_38px_110px_rgba(0,8,24,0.46)] lg:min-h-[680px] lg:grid-cols-[1.12fr_0.88fr]">
         <section className="vh-login-visual-enter relative hidden min-h-[680px] overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-12">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(197,164,39,0.34),transparent_28%),linear-gradient(145deg,#385f24,#203814_65%,#172710)]" aria-hidden="true" />
+          <img src="/brand/capuli-plan.webp" alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-25 grayscale" aria-hidden="true" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(196,154,34,0.26),transparent_28%),linear-gradient(145deg,rgba(60,90,32,0.92),rgba(23,37,12,0.96)_65%,rgba(23,37,12,0.99))]" aria-hidden="true" />
 
           <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#261838]/35 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#ead7fb] backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#17250c]/35 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#eadca4] backdrop-blur-md">
               <Leaf className="h-3.5 w-3.5" />
               Administración inmobiliaria
             </div>
           </div>
 
           <div className="relative max-w-xl">
-            <div className="mb-6 h-px w-20 bg-[#ff9e32]" aria-hidden="true" />
+            <div className="mb-6 h-px w-20 bg-[#c49a22]" aria-hidden="true" />
             <h1 className="brand-display text-5xl font-medium leading-[0.98] tracking-[-0.035em] xl:text-6xl">
               Control de clientes<br />y pagos
             </h1>
             <p className="mt-5 max-w-lg text-base leading-7 text-white/80">
               Una plataforma clara y segura para administrar clientes, pagos y documentos del proyecto.
             </p>
+            <p className="mt-4 max-w-lg font-serif text-lg italic text-[#eadca4]">Naturaleza, patrimonio y gestión en un solo lugar.</p>
             <div className="mt-8 flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/15 bg-[#261838]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Cartera de clientes</span>
-              <span className="rounded-full border border-white/15 bg-[#261838]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Control de pagos</span>
-              <span className="rounded-full border border-white/15 bg-[#261838]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Documentos centralizados</span>
+              <span className="rounded-full border border-white/15 bg-[#17250c]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Cartera de clientes</span>
+              <span className="rounded-full border border-white/15 bg-[#17250c]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Control de pagos</span>
+              <span className="rounded-full border border-white/15 bg-[#17250c]/35 px-3 py-2 text-xs text-white/85 backdrop-blur-md">Documentos centralizados</span>
             </div>
           </div>
         </section>
@@ -122,27 +124,27 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
               <img
                 src="/brand/capuli-logo.png"
                 alt="Condominio Rústico Capulí"
-                className="h-20 w-56 rounded-2xl border border-[#d9ddd9] bg-white object-contain p-1 shadow-sm"
+                className="h-20 w-56 rounded-2xl border border-[#dfe3d8] bg-white object-contain p-1 shadow-sm"
               />
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#54317f]">
-                <span className="h-2 w-2 rounded-full bg-[#72be44]" aria-hidden="true" />
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#2f4817]">
+                <span className="h-2 w-2 rounded-full bg-[#c49a22]" aria-hidden="true" />
                 Acceso seguro
               </div>
             </div>
 
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#54317f]">Panel administrativo</p>
-            <h2 className="brand-display mt-2 text-4xl font-medium tracking-tight text-[#33204f]">Bienvenido</h2>
-            <p className="mt-3 text-sm leading-6 text-[#697386]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2f4817]">Panel administrativo</p>
+            <h2 className="brand-display mt-2 text-4xl font-medium tracking-tight text-[#17250c]">Bienvenido</h2>
+            <p className="mt-3 text-sm leading-6 text-[#667060]">
               Ingresa tus credenciales para continuar a Condominio Rústico Capulí.
             </p>
-            {preview && <div className="mt-5 rounded-xl border border-[#e9d4ae] bg-[#fff7e7] p-3 text-sm text-[#69430d]">
+            {preview && <div className="mt-5 rounded-xl border border-[#eadca4] bg-[#fbf4d9] p-3 text-sm text-[#69430d]">
               Firebase aún no está conectado. Puedes recorrer el panel con datos ficticios.
-              <a href="?demo" className="mt-3 flex min-h-10 items-center justify-center rounded-lg bg-[#54317f] px-4 font-semibold text-white hover:bg-[#33204f]">Entrar a la vista de muestra</a>
+              <a href="?demo" className="mt-3 flex min-h-10 items-center justify-center rounded-lg bg-[#2f4817] px-4 font-semibold text-white hover:bg-[#17250c]">Entrar a la vista de muestra</a>
             </div>}
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5" aria-busy={loading}>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#33204f]">Correo electrónico</Label>
+                <Label htmlFor="email" className="text-[#17250c]">Correo electrónico</Label>
                 <Input
                   id="email"
                   type="email"
@@ -152,12 +154,12 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                   placeholder="nombre@empresa.com"
                   required
                   disabled={preview}
-                  className="h-12 rounded-xl bg-white transition-[border-color,box-shadow] duration-200 focus-visible:border-[#5c3585]"
+                  className="h-12 rounded-xl bg-white transition-[border-color,box-shadow] duration-200 focus-visible:border-[#3c5a20]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#33204f]">Contraseña</Label>
+                <Label htmlFor="password" className="text-[#17250c]">Contraseña</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -168,13 +170,13 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                     placeholder="Ingresa tu contraseña"
                     required
                     disabled={preview}
-                    className="h-12 rounded-xl bg-white pr-12 transition-[border-color,box-shadow] duration-200 focus-visible:border-[#5c3585]"
+                    className="h-12 rounded-xl bg-white pr-12 transition-[border-color,box-shadow] duration-200 focus-visible:border-[#3c5a20]"
                   />
                   <button
                     type="button"
                     aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                     onClick={() => setShowPassword(current => !current)}
-                    className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-[#697386] transition-colors hover:bg-[#f2ebf7] hover:text-[#54317f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5c3585]"
+                    className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-[#667060] transition-colors hover:bg-[#f8f5eb] hover:text-[#2f4817] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3c5a20]"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -184,7 +186,7 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                     type="button"
                     onClick={openResetDialog}
                     disabled={preview}
-                    className="-mr-2 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-[#54317f] transition-colors hover:bg-[#f2ebf7] hover:text-[#095c63] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5c3585] focus-visible:ring-offset-2"
+                    className="-mr-2 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-[#2f4817] transition-colors hover:bg-[#f8f5eb] hover:text-[#223610] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3c5a20] focus-visible:ring-offset-2"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -197,7 +199,7 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                 </Alert>
               )}
 
-              <Button type="submit" size="lg" className="vh-primary-action h-12 w-full rounded-xl bg-gradient-to-r from-[#5c3585] to-[#54317f] shadow-[0_10px_24px_rgba(13,111,120,0.22)]" disabled={loading || preview}>
+              <Button type="submit" size="lg" className="vh-primary-action h-12 w-full rounded-xl bg-gradient-to-r from-[#3c5a20] to-[#2f4817] shadow-[0_10px_24px_rgba(47,72,23,0.24)]" disabled={loading || preview}>
                 {loading ? (
                   <>
                     <LoaderCircle className="h-4 w-4 animate-spin motion-reduce:animate-none" />
@@ -212,28 +214,28 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
               </Button>
             </form>
 
-            <div className="mt-8 flex items-center gap-3 border-t border-[#e9ebe7] pt-6">
-              <ShieldCheck className="h-5 w-5 shrink-0 text-[#54317f]" />
-              <p className="text-xs leading-5 text-[#697386]">Acceso restringido al equipo autorizado del proyecto.</p>
+            <div className="mt-8 flex items-center gap-3 border-t border-[#e8eadf] pt-6">
+              <ShieldCheck className="h-5 w-5 shrink-0 text-[#2f4817]" />
+              <p className="text-xs leading-5 text-[#667060]">Acceso restringido al equipo autorizado del proyecto.</p>
             </div>
 
             <div className="mt-7 flex items-center gap-3">
-              <span className="text-xs text-[#697386]">Gestión comercial · Condominio Rústico Capulí</span>
+              <span className="text-xs text-[#667060]">Gestión comercial · Condominio Rústico Capulí</span>
             </div>
           </div>
         </section>
       </div>
 
       <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <DialogContent className="max-w-md rounded-2xl border-[#d9ddd9] bg-[#fffefb] p-6 shadow-2xl sm:p-7">
+        <DialogContent className="max-w-md rounded-2xl border-[#dfe3d8] bg-[#fffefa] p-6 shadow-2xl sm:p-7">
           <DialogHeader className="text-left">
-            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f2ebf7] text-[#54317f]" aria-hidden="true">
+            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f8f5eb] text-[#2f4817]" aria-hidden="true">
               <MailCheck className="h-5 w-5" />
             </div>
-            <DialogTitle className="brand-display text-2xl font-semibold text-[#33204f]">
+            <DialogTitle className="brand-display text-2xl font-semibold text-[#17250c]">
               {resetSent ? 'Revisa tu correo' : 'Restablecer contraseña'}
             </DialogTitle>
-            <DialogDescription className="leading-6 text-[#697386]">
+            <DialogDescription className="leading-6 text-[#667060]">
               {resetSent
                 ? 'Si existe una cuenta asociada, recibirás un enlace seguro para crear una nueva contraseña.'
                 : 'Ingresa el correo que utilizas para acceder al panel.'}
@@ -242,13 +244,13 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
 
           {resetSent ? (
             <div className="space-y-5">
-              <div className="rounded-xl border border-[#cde6df] bg-[#f0faf7] px-4 py-3 text-sm leading-6 text-[#285f59]" role="status" aria-live="polite">
+              <div className="rounded-xl border border-[#d4ddc4] bg-[#f8f5eb] px-4 py-3 text-sm leading-6 text-[#3c5a20]" role="status" aria-live="polite">
                 Revisa la bandeja de entrada y la carpeta de correo no deseado de <span className="font-semibold break-all">{resetEmail.trim()}</span>.
               </div>
               <DialogFooter>
                 <Button
                   type="button"
-                  className="vh-primary-action h-11 w-full rounded-xl bg-gradient-to-r from-[#5c3585] to-[#54317f]"
+                  className="vh-primary-action h-11 w-full rounded-xl bg-gradient-to-r from-[#3c5a20] to-[#2f4817]"
                   onClick={() => setResetDialogOpen(false)}
                 >
                   Volver al inicio de sesión
@@ -258,7 +260,7 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
           ) : (
             <form onSubmit={handleResetSubmit} className="space-y-5" aria-busy={resetLoading}>
               <div className="space-y-2">
-                <Label htmlFor="reset-email" className="text-[#33204f]">Correo electrónico</Label>
+                <Label htmlFor="reset-email" className="text-[#17250c]">Correo electrónico</Label>
                 <Input
                   id="reset-email"
                   type="email"
@@ -273,9 +275,9 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                   aria-describedby={resetError ? 'reset-email-error' : 'reset-email-help'}
                   placeholder="nombre@empresa.com"
                   required
-                  className="h-12 rounded-xl bg-white transition-[border-color,box-shadow] duration-200 focus-visible:border-[#5c3585]"
+                  className="h-12 rounded-xl bg-white transition-[border-color,box-shadow] duration-200 focus-visible:border-[#3c5a20]"
                 />
-                <p id="reset-email-help" className="text-xs leading-5 text-[#697386]">Solo necesitas el correo registrado; no solicitaremos datos de clientes.</p>
+                <p id="reset-email-help" className="text-xs leading-5 text-[#667060]">Solo necesitas el correo registrado; no solicitaremos datos de clientes.</p>
               </div>
 
               {resetError && (
@@ -296,7 +298,7 @@ export default function FirebaseLogin({ preview = false }: { preview?: boolean }
                 </Button>
                 <Button
                   type="submit"
-                  className="vh-primary-action h-11 rounded-xl bg-gradient-to-r from-[#5c3585] to-[#54317f]"
+                  className="vh-primary-action h-11 rounded-xl bg-gradient-to-r from-[#3c5a20] to-[#2f4817]"
                   disabled={resetLoading || !resetEmail.trim()}
                 >
                   {resetLoading ? (

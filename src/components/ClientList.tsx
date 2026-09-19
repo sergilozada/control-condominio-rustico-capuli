@@ -1051,7 +1051,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           headerHtml += `<img src="${logoData[0]}" style="width:100%;height:auto;"/>`;
         }
         headerHtml += '<h2>CRONOGRAMA DE PAGOS</h2>';
-        headerHtml += `<div style="background:#e8d873;padding:4px;margin-bottom:6px;">Teléfono de cobranza Capulí: ${scheduleConfig.cobranzaPhone}</div>`;
+        headerHtml += `<div style="background:#eadca4;padding:4px;margin-bottom:6px;">Teléfono de cobranza Capulí: ${scheduleConfig.cobranzaPhone}</div>`;
         headerHtml += '</div>';
 
         let infoHtml = '<table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><tr>';
@@ -1454,12 +1454,12 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
 
   return (
     <div className="w-full space-y-6">
-      <Card className="overflow-hidden border-[#d9ddd9] bg-[#fffefb] shadow-sm">
-        <CardHeader className="flex flex-col gap-4 border-b border-[#e9ebe7] bg-[#fffefb] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <Card className="overflow-hidden border-[#dfe3d8] bg-[#fffefa] shadow-sm">
+        <CardHeader className="flex flex-col gap-4 border-b border-[#e8eadf] bg-[#fffefa] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#31521d]">Condominio Rústico Capulí</p>
-            <CardTitle className="brand-display text-2xl text-[#33204f]">{filteredClients.length} cliente{filteredClients.length === 1 ? '' : 's'}</CardTitle>
-            <p className="mt-1 text-sm text-[#697386]">Consulta pagos, documentos y datos de cada registro.</p>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#2f4817]">Condominio Rústico Capulí</p>
+            <CardTitle className="brand-display text-2xl text-[#17250c]">{filteredClients.length} cliente{filteredClients.length === 1 ? '' : 's'}</CardTitle>
+            <p className="mt-1 text-sm text-[#667060]">Consulta pagos, documentos y datos de cada registro.</p>
           </div>
           <div className="flex flex-wrap justify-end gap-2">
             <Button onClick={exportClientsToPDF} disabled={filteredClients.length === 0}>
@@ -1470,26 +1470,26 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         </CardHeader>
         <CardContent className="p-0">
           {filterType === 'overdue' && (
-            <div className="flex flex-wrap items-center gap-3 border-b border-[#e9ebe7] bg-[#f5f4ef]/70 px-5 py-4 sm:px-6">
+            <div className="flex flex-wrap items-center gap-3 border-b border-[#e8eadf] bg-[#f8f5eb]/70 px-5 py-4 sm:px-6">
               <Label>Mes de atraso:</Label>
               <Select value={overdueMonth === null ? 'all' : String(overdueMonth)} onValueChange={value => setOverdueMonth(value === 'all' ? null : Number(value))}>
-                <SelectTrigger aria-label="Mes de atraso" className="h-10 w-[150px] rounded-xl border-[#d9ddd9] bg-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-label="Mes de atraso" className="h-10 w-[150px] rounded-xl border-[#dfe3d8] bg-white"><SelectValue /></SelectTrigger>
                 <SelectContent><SelectItem value="all">Todos</SelectItem>{monthNames.map((month, index) => <SelectItem key={month} value={String(index)}>{month}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={String(overdueYear)} onValueChange={value => setOverdueYear(Number(value))}>
-                <SelectTrigger aria-label="Año de atraso" className="h-10 w-[100px] rounded-xl border-[#d9ddd9] bg-white"><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-label="Año de atraso" className="h-10 w-[100px] rounded-xl border-[#dfe3d8] bg-white"><SelectValue /></SelectTrigger>
                 <SelectContent>{availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}</SelectContent>
               </Select>
 
-              <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-xl border border-[#d9ddd9] bg-white px-3 py-1.5 shadow-sm">
-                <Label htmlFor="overdue-count-filter" className="text-sm font-medium text-[#5f6878]">
+              <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-xl border border-[#dfe3d8] bg-white px-3 py-1.5 shadow-sm">
+                <Label htmlFor="overdue-count-filter" className="text-sm font-medium text-[#667060]">
                   Filtrar por cuotas atrasadas:
                 </Label>
                 <Select
                   value={overdueCountFilter}
                   onValueChange={(value) => setOverdueCountFilter(value as OverdueCountFilter)}
                 >
-                  <SelectTrigger id="overdue-count-filter" className="h-9 w-[170px] border-[#d9ddd9] bg-[#fffefb]">
+                  <SelectTrigger id="overdue-count-filter" className="h-9 w-[170px] border-[#dfe3d8] bg-[#fffefa]">
                     <SelectValue placeholder="Seleccionar" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1507,15 +1507,15 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
               <Button size="sm" variant="outline" onClick={resetOverdueFilter}>Limpiar</Button>
             </div>
           )}
-          <div className="vh-client-table-shell overflow-x-auto rounded-2xl border border-[#d9ddd9] bg-white shadow-sm">
-            <div className="flex items-center justify-between gap-4 border-b border-[#e4e7e2] bg-[#fffefb] px-4 py-3">
-              <p className="text-xs font-medium text-[#697386]">Desliza la tabla horizontalmente para ver todas las columnas.</p>
+          <div className="vh-client-table-shell overflow-x-auto rounded-2xl border border-[#dfe3d8] bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-4 border-b border-[#e5e7df] bg-[#fffefa] px-4 py-3">
+              <p className="text-xs font-medium text-[#667060]">Desliza la tabla horizontalmente para ver todas las columnas.</p>
             </div>
             <Table
               aria-label={filterType === 'overdue' ? 'Clientes con cuotas atrasadas' : 'Clientes registrados'}
               className="vh-spaced-table vh-client-table min-w-[1380px] table-fixed text-[11px] xl:text-[12px]"
             >
-              <TableHeader className="bg-[#f5f4ef]">
+              <TableHeader className="bg-[#f8f5eb]">
                 <TableRow>
                   <TableHead className="w-[4%] px-1.5 text-center">ID</TableHead>
                   <TableHead className="w-[13%] px-1.5 text-center">Nombres</TableHead>
@@ -1541,15 +1541,15 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                 {filteredClients.map((client, index) => (
                   <TableRow
                     key={client.id}
-                    className="group border-[#e4e7e2] odd:bg-white even:bg-[#fbfcfa] hover:bg-[#f7f2fb]"
+                    className="group border-[#e5e7df] odd:bg-white even:bg-[#fffefa] hover:bg-[#fcfaf5]"
                   >
-                    <TableCell className="bg-inherit px-1.5 py-3 text-center font-semibold text-[#54317f] group-hover:bg-[#f7f2fb]">{index + 1}</TableCell>
-                    <TableCell className="break-words bg-inherit px-1.5 py-3 group-hover:bg-[#f7f2fb]">
+                    <TableCell className="bg-inherit px-1.5 py-3 text-center font-semibold text-[#2f4817] group-hover:bg-[#fcfaf5]">{index + 1}</TableCell>
+                    <TableCell className="break-words bg-inherit px-1.5 py-3 group-hover:bg-[#fcfaf5]">
                       <div className="mx-auto w-fit max-w-full space-y-1.5 text-left">
                         {getClientTitulares(client).map((titular, titularIndex) => (
                           <div key={`${client.id}-nombre-${titularIndex}`} className="flex items-start gap-2">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f2ebf7] text-[10px] font-semibold text-[#54317f]">{titularIndex + 1}</span>
-                            <span className="font-medium text-[#182033]">{titular.nombre || 'Sin nombre'}</span>
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f8f5eb] text-[10px] font-semibold text-[#2f4817]">{titularIndex + 1}</span>
+                            <span className="font-medium text-[#172012]">{titular.nombre || 'Sin nombre'}</span>
                           </div>
                         ))}
                       </div>
@@ -1557,7 +1557,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                     <TableCell className="break-words px-1.5 py-3">
                       <div className="mx-auto w-fit max-w-full space-y-1.5 text-center">
                         {getClientTitulares(client).map((titular, titularIndex) => (
-                          <div key={`${client.id}-dni-${titularIndex}`} className="flex min-h-5 items-center justify-center text-[#5f6878]">
+                          <div key={`${client.id}-dni-${titularIndex}`} className="flex min-h-5 items-center justify-center text-[#667060]">
                             {titular.dni || 'Sin DNI'}
                           </div>
                         ))}
@@ -1647,7 +1647,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                     <TableCell className="px-1.5 py-3 text-center">{client.manzana}</TableCell>
                     <TableCell className="px-1.5 py-3 text-center">{client.lote}</TableCell>
                     <TableCell className="px-1.5 py-3 text-center">{client.metraje} m²</TableCell>
-                    <TableCell className="px-1.5 py-3 text-center font-semibold text-[#33204f]">S/ {client.montoTotal.toFixed(2)}</TableCell>
+                    <TableCell className="px-1.5 py-3 text-center font-semibold text-[#17250c]">S/ {client.montoTotal.toFixed(2)}</TableCell>
                     <TableCell className="px-1.5 py-3 text-center">
                       <Badge variant={client.formaPago === 'contado' ? 'default' : 'secondary'}>
                         {client.formaPago}
@@ -1674,7 +1674,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                         <Badge variant="outline">{getClientStatus(client)}</Badge>
                       </TableCell>
                     )}
-                    <TableCell className="bg-inherit px-1.5 py-3 group-hover:bg-[#f7f2fb]">
+                    <TableCell className="bg-inherit px-1.5 py-3 group-hover:bg-[#fcfaf5]">
                       <div className="flex flex-wrap items-center justify-center gap-1.5">
                         {showMinuteAction && canLegal && (
                           <MinutaUploadButton
@@ -1713,8 +1713,8 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                             title="Libro de observaciones"
                             onClick={() => openObservations(client)}
                             className={client.observationEntries?.length || client.observaciones?.trim()
-                              ? 'border-[#ff9e32]/70 bg-[#fff8e8] text-[#805f1c] hover:bg-[#fff3d5] hover:text-[#805f1c]'
-                              : 'text-[#33204f]'}
+                              ? 'border-[#c49a22]/70 bg-[#fcf7e8] text-[#a67b0d] hover:bg-[#fbf4d9] hover:text-[#a67b0d]'
+                              : 'text-[#17250c]'}
                           >
                             <BookOpen className="w-4 h-4" />
                           </Button>
@@ -1741,33 +1741,33 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       <Dialog open={observationsClient !== null} onOpenChange={open => {
         if (!open) closeObservations();
       }}>
-        <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#d9ddd9] bg-[#fffefb] p-0 sm:max-w-xl">
-          <DialogHeader className="border-b border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-5 text-left">
-            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f2ebf7] text-[#54317f]">
+        <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#dfe3d8] bg-[#fffefa] p-0 sm:max-w-xl">
+          <DialogHeader className="border-b border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-5 text-left">
+            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f8f5eb] text-[#2f4817]">
               <BookOpen className="h-5 w-5" />
             </div>
-            <DialogTitle className="text-xl text-[#33204f]">Libro de observaciones</DialogTitle>
-            <DialogDescription className="leading-6 text-[#697386]">
+            <DialogTitle className="text-xl text-[#17250c]">Libro de observaciones</DialogTitle>
+            <DialogDescription className="leading-6 text-[#667060]">
               {observationsClient ? getClientDisplayName(observationsClient) : ''}. Cada anotación conserva autor y fecha.
             </DialogDescription>
           </DialogHeader>
 
           <div className="max-h-[65vh] space-y-4 overflow-y-auto px-6 py-5">
             <div className="space-y-2" aria-label="Anotaciones anteriores">
-              {observationsClient?.observaciones?.trim() && <div className="rounded-xl border border-[#d9ddd9] bg-[#f7f8f6] p-3 text-sm">
-                <p className="font-semibold text-[#33204f]">Nota anterior</p>
-                <p className="mt-1 whitespace-pre-wrap text-[#5f6878]">{observationsClient.observaciones}</p>
+              {observationsClient?.observaciones?.trim() && <div className="rounded-xl border border-[#dfe3d8] bg-[#fcfaf5] p-3 text-sm">
+                <p className="font-semibold text-[#17250c]">Nota anterior</p>
+                <p className="mt-1 whitespace-pre-wrap text-[#667060]">{observationsClient.observaciones}</p>
               </div>}
-              {observationsClient?.observationEntries?.slice().reverse().map(entry => <div key={entry.id} className="rounded-xl border border-[#d9ddd9] bg-white p-3 text-sm">
-                <div className="flex flex-wrap justify-between gap-2 font-semibold text-[#33204f]">
+              {observationsClient?.observationEntries?.slice().reverse().map(entry => <div key={entry.id} className="rounded-xl border border-[#dfe3d8] bg-white p-3 text-sm">
+                <div className="flex flex-wrap justify-between gap-2 font-semibold text-[#17250c]">
                   <span>{entry.author}</span><time>{new Date(entry.at).toLocaleString('es-PE')}</time>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-[#5f6878]">{entry.text}</p>
+                <p className="mt-2 whitespace-pre-wrap text-[#667060]">{entry.text}</p>
               </div>)}
-              {!observationsClient?.observaciones?.trim() && !observationsClient?.observationEntries?.length && <p className="text-sm text-[#697386]">Aún no hay anotaciones para este cliente.</p>}
+              {!observationsClient?.observaciones?.trim() && !observationsClient?.observationEntries?.length && <p className="text-sm text-[#667060]">Aún no hay anotaciones para este cliente.</p>}
             </div>
             {canEditClients && <>
-            <Label htmlFor="client-observations" className="text-[#33204f]">Nueva anotación</Label>
+            <Label htmlFor="client-observations" className="text-[#17250c]">Nueva anotación</Label>
             <Textarea
               id="client-observations"
               value={observationDraft}
@@ -1775,17 +1775,17 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
               maxLength={2000}
               rows={8}
               placeholder="Escribe un acuerdo o seguimiento…"
-              className="min-h-44 resize-y rounded-xl bg-white leading-6 focus-visible:border-[#5c3585]"
+              className="min-h-44 resize-y rounded-xl bg-white leading-6 focus-visible:border-[#3c5a20]"
               disabled={savingObservation}
               autoFocus
             />
-            <p className="text-right text-xs text-[#697386]" aria-live="polite">
+            <p className="text-right text-xs text-[#667060]" aria-live="polite">
               {observationDraft.length}/2000
             </p>
             </>}
           </div>
 
-          <DialogFooter className="gap-2 border-t border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-4 sm:space-x-0">
+          <DialogFooter className="gap-2 border-t border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-4 sm:space-x-0">
             <Button variant="outline" onClick={closeObservations} disabled={savingObservation}>
               Cancelar
             </Button>
@@ -1809,7 +1809,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
   <DialogContent className="max-h-[94vh] w-[calc(100vw-1rem)] max-w-[1500px] overflow-x-hidden overflow-y-auto p-4 sm:w-[calc(100vw-2rem)] sm:p-6">
             <DialogHeader className="pr-8">
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <DialogTitle className="text-center text-xl text-[#33204f] sm:text-left">Detalle de Cuotas</DialogTitle>
+                <DialogTitle className="text-center text-xl text-[#17250c] sm:text-left">Detalle de Cuotas</DialogTitle>
                 <div className="flex flex-wrap justify-center gap-2 sm:justify-end">
                   <Button
                     size="sm"
@@ -1872,8 +1872,8 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                   </div>
 
                   {canPay && <div className="mx-auto flex w-full max-w-5xl justify-end">
-                    <div className="w-full rounded-xl border border-[#d9ddd9] bg-[#f7f8f6] p-3 shadow-sm sm:justify-self-end">
-                      <Label htmlFor="paymentDate" className="block text-left text-[11px] font-semibold leading-4 text-[#5f6878]">
+                    <div className="w-full rounded-xl border border-[#dfe3d8] bg-[#fcfaf5] p-3 shadow-sm sm:justify-self-end">
+                      <Label htmlFor="paymentDate" className="block text-left text-[11px] font-semibold leading-4 text-[#667060]">
                         Fecha para marcar pagos
                       </Label>
                       <Input
@@ -1888,7 +1888,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                   
                   <div className="w-full [&>div]:overflow-x-hidden">
                     <Table className="block w-full text-sm 2xl:table 2xl:table-fixed 2xl:text-[11px]">
-                      <TableHeader className="hidden bg-[#f5f4ef] 2xl:table-header-group">
+                      <TableHeader className="hidden bg-[#f8f5eb] 2xl:table-header-group">
                         <TableRow>
                           <TableHead className="w-[5%] px-2 text-center">N°</TableHead>
                           <TableHead className="w-[10%] px-2 text-center">Vencimiento</TableHead>
@@ -1910,7 +1910,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
                           const totalDisplayed = cuota.monto + displayedMora;
                           
                           return (
-                            <TableRow key={index} className="grid grid-cols-2 gap-4 rounded-xl border border-[#d9ddd9] bg-white p-4 shadow-sm sm:grid-cols-3 lg:grid-cols-4 2xl:table-row 2xl:rounded-none 2xl:border-x-0 2xl:bg-transparent 2xl:p-0 2xl:shadow-none">
+                            <TableRow key={index} className="grid grid-cols-2 gap-4 rounded-xl border border-[#dfe3d8] bg-white p-4 shadow-sm sm:grid-cols-3 lg:grid-cols-4 2xl:table-row 2xl:rounded-none 2xl:border-x-0 2xl:bg-transparent 2xl:p-0 2xl:shadow-none">
                               <TableCell className="col-span-2 block min-w-0 p-0 text-center sm:col-span-1 2xl:table-cell 2xl:p-2">
                                 <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500 2xl:hidden">Cuota</span>
                                 <Badge variant={cuota.numero === 0 ? 'secondary' : 'outline'}>
@@ -2057,15 +2057,15 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       <Dialog open={attachmentManager !== null} onOpenChange={open => {
         if (!open && !deletingAttachment) setAttachmentManager(null);
       }}>
-        <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#d9ddd9] bg-[#fffefb] p-0 sm:max-w-lg">
-          <DialogHeader className="border-b border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-5 text-left">
-            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f2ebf7] text-[#54317f]">
+        <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-[#dfe3d8] bg-[#fffefa] p-0 sm:max-w-lg">
+          <DialogHeader className="border-b border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-5 text-left">
+            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f8f5eb] text-[#2f4817]">
               <FileCheck2 className="h-5 w-5" />
             </div>
-            <DialogTitle className="text-xl text-[#33204f]">
+            <DialogTitle className="text-xl text-[#17250c]">
               {attachmentManager?.fileType === 'voucher' ? 'Vouchers' : 'Boletas'} de la cuota {attachmentManager?.cuotaNumber}
             </DialogTitle>
-            <DialogDescription className="leading-6 text-[#697386]">
+            <DialogDescription className="leading-6 text-[#667060]">
               {attachmentManager?.clientName}. Selecciona la papelera del archivo específico que deseas borrar.
             </DialogDescription>
           </DialogHeader>
@@ -2074,20 +2074,20 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
             {attachmentManager?.files.map((file, index) => (
               <div
                 key={file.path || file.url}
-                className="flex min-h-14 items-center gap-2 rounded-xl border border-[#d9ddd9] bg-white p-1.5"
+                className="flex min-h-14 items-center gap-2 rounded-xl border border-[#dfe3d8] bg-white p-1.5"
               >
                 <a
                   href={file.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5c3585]"
+                  className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-2.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3c5a20]"
                   aria-label={`Abrir ${file.name || `archivo ${index + 1}`}`}
                 >
-                  <FileText className="h-5 w-5 shrink-0 text-[#54317f]" />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#182033]">
+                  <FileText className="h-5 w-5 shrink-0 text-[#2f4817]" />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#172012]">
                     {file.name || `Archivo ${index + 1}`}
                   </span>
-                  <Eye className="h-4 w-4 shrink-0 text-[#697386]" />
+                  <Eye className="h-4 w-4 shrink-0 text-[#667060]" />
                 </a>
                 <Button
                   type="button"
@@ -2104,7 +2104,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
             ))}
           </div>
 
-          <DialogFooter className="border-t border-[#e9ebe7] bg-[#f5f4ef]/80 px-6 py-4">
+          <DialogFooter className="border-t border-[#e8eadf] bg-[#f8f5eb]/80 px-6 py-4">
             <Button variant="outline" onClick={() => setAttachmentManager(null)} disabled={deletingAttachment}>
               Cerrar
             </Button>
@@ -2115,15 +2115,15 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       <AlertDialog open={attachmentToDelete !== null} onOpenChange={open => {
         if (!open && !deletingAttachment) setAttachmentToDelete(null);
       }}>
-        <AlertDialogContent className="w-[calc(100vw-2rem)] rounded-2xl border-[#d9ddd9] bg-[#fffefb] sm:max-w-md">
+        <AlertDialogContent className="w-[calc(100vw-2rem)] rounded-2xl border-[#dfe3d8] bg-[#fffefa] sm:max-w-md">
           <AlertDialogHeader>
             <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-[#a63d45] sm:mx-0">
               <Trash2 className="h-5 w-5" />
             </div>
-            <AlertDialogTitle className="text-[#33204f]">
+            <AlertDialogTitle className="text-[#17250c]">
               ¿Eliminar {attachmentToDelete?.fileType === 'voucher' ? 'este voucher' : 'esta boleta'}?
             </AlertDialogTitle>
-            <AlertDialogDescription className="leading-6 text-[#697386]">
+            <AlertDialogDescription className="leading-6 text-[#667060]">
               {attachmentToDelete?.attachment.name || 'El archivo seleccionado'} se quitará de la cuota {attachmentToDelete?.cuotaNumber}. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>

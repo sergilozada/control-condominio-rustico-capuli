@@ -32,7 +32,7 @@ export default function App() {
     if (import.meta.env.DEV) return <QueryClientProvider client={queryClient}>
       <TooltipProvider><Toaster /><ErrorBoundary><DemoAuthProvider><FirebaseLogin preview /></DemoAuthProvider></ErrorBoundary></TooltipProvider>
     </QueryClientProvider>;
-    return <main className="grid min-h-screen place-items-center bg-[#f7f4fb] p-6 text-center">
+    return <main className="grid min-h-screen place-items-center bg-[#fcfaf5] p-6 text-center">
       <div className="max-w-lg rounded-2xl bg-white p-8 shadow-lg">
         <img src="/brand/capuli-logo.png" alt="Condominio Rústico Capulí" className="mx-auto h-28 w-80 max-w-full object-contain" />
         <h1 className="mt-6 text-xl font-semibold">Configurar Firebase de Condominio Rústico Capulí</h1>

@@ -548,8 +548,8 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
   const stats = getMonthStats(selectedMonth, selectedYear);
   const report = getMonthReport(selectedMonth, selectedYear);
   const paymentStatusData = [
-    { name: 'Pagadas', value: stats.cuotasPagadas, color: '#5c3585' },
-    { name: 'Pendientes', value: stats.cuotasPendientes, color: '#ff9e32' },
+    { name: 'Pagadas', value: stats.cuotasPagadas, color: '#3c5a20' },
+    { name: 'Pendientes', value: stats.cuotasPendientes, color: '#c49a22' },
   ];
   const monthlyTrendData = Array.from({ length: 12 }, (_, index) => {
     const period = new Date(selectedYear, selectedMonth - 11 + index, 1);
@@ -823,9 +823,9 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
           </div>
 
           <section aria-label="Gráficos de estadísticas" className="grid min-w-0 gap-4 xl:grid-cols-[1.35fr_0.65fr]">
-            <Card className="vh-panel-enter min-w-0 overflow-hidden border-[#d9ddd9] bg-[#fffefb] shadow-sm">
-              <CardHeader className="border-b border-[#e9ebe7] pb-4">
-                <CardTitle className="text-lg text-[#33204f]">Ingresos de los últimos 12 meses</CardTitle>
+            <Card className="vh-panel-enter min-w-0 overflow-hidden border-[#dfe3d8] bg-[#fffefa] shadow-sm">
+              <CardHeader className="border-b border-[#e8eadf] pb-4">
+                <CardTitle className="text-lg text-[#17250c]">Ingresos de los últimos 12 meses</CardTitle>
                 <CardDescription>Montos proyectados e ingresados, expresados en soles.</CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
@@ -836,28 +836,28 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={monthlyTrendData} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
-                      <CartesianGrid stroke="#d9ddd9" strokeDasharray="3 5" vertical={false} />
-                      <XAxis dataKey="period" tick={{ fill: '#697386', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#bfc5bf' }} />
+                      <CartesianGrid stroke="#dfe3d8" strokeDasharray="3 5" vertical={false} />
+                      <XAxis dataKey="period" tick={{ fill: '#667060', fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#bfc5bf' }} />
                       <YAxis
-                        tick={{ fill: '#697386', fontSize: 11 }}
+                        tick={{ fill: '#667060', fontSize: 11 }}
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value) => formatCompactCurrency(Number(value))}
                       />
                       <Tooltip
                         formatter={(value, name) => [formatCurrency(Number(value)), name === 'proyectado' ? 'Proyectado' : 'Ingresado']}
-                        contentStyle={{ borderRadius: 12, borderColor: '#d9ddd9', background: '#fffefb', boxShadow: '0 12px 30px rgba(21,40,77,.12)' }}
-                        labelStyle={{ color: '#33204f', fontWeight: 600 }}
+                        contentStyle={{ borderRadius: 12, borderColor: '#dfe3d8', background: '#fffefa', boxShadow: '0 12px 30px rgba(21,40,77,.12)' }}
+                        labelStyle={{ color: '#17250c', fontWeight: 600 }}
                       />
-                      <Legend wrapperStyle={{ color: '#5f6878', fontSize: 12, paddingTop: 12 }} />
+                      <Legend wrapperStyle={{ color: '#667060', fontSize: 12, paddingTop: 12 }} />
                       <Line
                         type="monotone"
                         dataKey="proyectado"
                         name="Proyectado"
-                        stroke="#33204f"
+                        stroke="#17250c"
                         strokeWidth={2.5}
                         strokeDasharray="6 5"
-                        dot={{ r: 3, fill: '#fffefb', strokeWidth: 2 }}
+                        dot={{ r: 3, fill: '#fffefa', strokeWidth: 2 }}
                         activeDot={{ r: 5 }}
                         isAnimationActive={!shouldReduceMotion}
                         animationDuration={800}
@@ -866,9 +866,9 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
                         type="monotone"
                         dataKey="ingresado"
                         name="Ingresado"
-                        stroke="#5c3585"
+                        stroke="#3c5a20"
                         strokeWidth={3}
-                        dot={{ r: 3, fill: '#5c3585', strokeWidth: 0 }}
+                        dot={{ r: 3, fill: '#3c5a20', strokeWidth: 0 }}
                         activeDot={{ r: 5 }}
                         isAnimationActive={!shouldReduceMotion}
                         animationDuration={900}
@@ -879,9 +879,9 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="vh-panel-enter min-w-0 overflow-hidden border-[#d9ddd9] bg-[#fffefb] shadow-sm" style={{ animationDelay: '90ms' }}>
-              <CardHeader className="border-b border-[#e9ebe7] pb-4">
-                <CardTitle className="text-lg text-[#33204f]">Estado de las cuotas</CardTitle>
+            <Card className="vh-panel-enter min-w-0 overflow-hidden border-[#dfe3d8] bg-[#fffefa] shadow-sm" style={{ animationDelay: '90ms' }}>
+              <CardHeader className="border-b border-[#e8eadf] pb-4">
+                <CardTitle className="text-lg text-[#17250c]">Estado de las cuotas</CardTitle>
                 <CardDescription>{monthNames[selectedMonth]} {selectedYear} · cantidad de cuotas.</CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
@@ -892,13 +892,13 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={paymentStatusData} margin={{ top: 24, right: 12, left: 0, bottom: 4 }}>
-                      <CartesianGrid stroke="#d9ddd9" strokeDasharray="3 5" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fill: '#5f6878', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#bfc5bf' }} />
-                      <YAxis allowDecimals={false} tick={{ fill: '#697386', fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <CartesianGrid stroke="#dfe3d8" strokeDasharray="3 5" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fill: '#667060', fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#bfc5bf' }} />
+                      <YAxis allowDecimals={false} tick={{ fill: '#667060', fontSize: 11 }} tickLine={false} axisLine={false} />
                       <Tooltip
                         formatter={(value) => [`${Number(value)} cuotas`, 'Cantidad']}
-                        contentStyle={{ borderRadius: 12, borderColor: '#d9ddd9', background: '#fffefb', boxShadow: '0 12px 30px rgba(21,40,77,.12)' }}
-                        cursor={{ fill: '#f2f1ec' }}
+                        contentStyle={{ borderRadius: 12, borderColor: '#dfe3d8', background: '#fffefa', boxShadow: '0 12px 30px rgba(21,40,77,.12)' }}
+                        cursor={{ fill: '#fcfaf5' }}
                       />
                       <Bar
                         dataKey="value"
@@ -907,7 +907,7 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
                         animationDuration={750}
                       >
                         {paymentStatusData.map(item => <Cell key={item.name} fill={item.color} />)}
-                        <LabelList dataKey="value" position="top" fill="#33204f" fontSize={12} fontWeight={600} />
+                        <LabelList dataKey="value" position="top" fill="#17250c" fontSize={12} fontWeight={600} />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>

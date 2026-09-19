@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { createMinute, updateMinute } from './minuteStore';
 import { blankBuyer, blankMinute, buildSchedule, money, validateMinute, type InitialPayment, type MinuteBuyer, type MinuteDraft, type MinuteRecord } from './types';
 
-const field = 'h-10 rounded-xl border-[#d9ddd9] bg-white';
+const field = 'h-10 rounded-xl border-[#dfe3d8] bg-white';
 const today = () => {
   const date = new Date();
   return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
@@ -166,76 +166,76 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   };
 
   if (!canManageMinutes(user?.role)) return <div className="rounded-2xl border bg-white p-8 text-center">El acceso a Minutas corresponde al administrador y al área legal.</div>;
-  if (!unlocked) return <div className="mx-auto grid min-h-[65vh] max-w-5xl overflow-hidden rounded-3xl border border-[#ded7e5] bg-white shadow-xl lg:grid-cols-2">
-    <section className="flex flex-col justify-end bg-[#2f501d] p-8 text-white sm:p-10" style={{ backgroundImage: 'linear-gradient(135deg, #203814f2, #6b5a17de)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+  if (!unlocked) return <div className="mx-auto grid min-h-[65vh] max-w-5xl overflow-hidden rounded-3xl border border-[#dfe4d6] bg-white shadow-xl lg:grid-cols-2">
+    <section className="flex flex-col justify-end bg-[#2f4817] p-8 text-white sm:p-10" style={{ backgroundImage: 'linear-gradient(135deg, #17250cf2, #5b3b15de)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <img src="/brand/capuli-logo.png" alt="Condominio Rústico Capulí" className="mb-auto h-24 w-64 rounded-xl bg-white object-contain p-2" />
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffc17c]">Área legal</p>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#eadca4]">Área legal</p>
       <h1 className="brand-display mt-3 text-4xl">Minutas de Capulí</h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-white/85">Accede al expediente de compradores, pagos y borradores para revisión.</p>
     </section>
     <section className="flex flex-col justify-center p-8 sm:p-10">
-      <LockKeyhole className="mb-5 h-10 w-10 text-[#54317f]" />
-      <h2 className="brand-display text-3xl text-[#33204f]">Ingresar a Minutas</h2>
-      <p className="mt-2 text-sm text-[#697386]">Verifica de nuevo la contraseña de tu cuenta autorizada.</p>
+      <LockKeyhole className="mb-5 h-10 w-10 text-[#2f4817]" />
+      <h2 className="brand-display text-3xl text-[#17250c]">Ingresar a Minutas</h2>
+      <p className="mt-2 text-sm text-[#667060]">Verifica de nuevo la contraseña de tu cuenta autorizada.</p>
       <form onSubmit={event => void handleLogin(event)} className="mt-8 space-y-4">
         {!preview && <><div className="space-y-2"><Label htmlFor="minute-email">Correo</Label><Input id="minute-email" type="email" value={firebaseUser?.email || ''} readOnly autoComplete="username" /></div>
         <div className="space-y-2"><Label htmlFor="minute-password">Contraseña</Label><Input id="minute-password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></div></>}
         {loginError && <p role="alert" className="text-sm text-rose-700">{loginError}</p>}
-        <Button type="submit" disabled={loginBusy} className="w-full bg-[#54317f] text-white hover:bg-[#33204f]">{preview ? 'Entrar a la muestra de Minutas' : loginBusy ? 'Verificando…' : 'Ingresar a Minutas'}</Button>
+        <Button type="submit" disabled={loginBusy} className="w-full bg-[#2f4817] text-white hover:bg-[#17250c]">{preview ? 'Entrar a la muestra de Minutas' : loginBusy ? 'Verificando…' : 'Ingresar a Minutas'}</Button>
       </form>
     </section>
   </div>;
 
-  const navigation = <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e4ddeb] bg-white px-4 py-3 shadow-sm">
-    <div><p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#54317f]">Panel de gestión</p><h1 className="brand-display text-2xl text-[#33204f]">{workspaceView === 'home' ? 'Inicio' : 'Minutas'}</h1></div>
-    <nav aria-label="Navegación de Minutas" className="flex flex-wrap gap-1 rounded-xl border border-[#e4ddeb] bg-[#fbfaf8] p-1">
-      <Button size="sm" variant="ghost" onClick={() => setWorkspaceView('home')} className={workspaceView === 'home' ? 'bg-[#dff5f3] text-[#185d66]' : ''}><Home className="h-4 w-4" /> Inicio</Button>
-      <Button size="sm" variant="ghost" onClick={() => setWorkspaceView('records')} className={workspaceView === 'records' ? 'bg-[#dff5f3] text-[#185d66]' : ''}><Search className="h-4 w-4" /> Minutas</Button>
+  const navigation = <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#dfe4d6] bg-white px-4 py-3 shadow-sm">
+    <div><p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2f4817]">Panel de gestión</p><h1 className="brand-display text-2xl text-[#17250c]">{workspaceView === 'home' ? 'Inicio' : 'Minutas'}</h1></div>
+    <nav aria-label="Navegación de Minutas" className="flex flex-wrap gap-1 rounded-xl border border-[#dfe4d6] bg-[#fcfaf5] p-1">
+      <Button size="sm" variant="ghost" onClick={() => setWorkspaceView('home')} className={workspaceView === 'home' ? 'bg-[#eef1e6] text-[#3c5a20]' : ''}><Home className="h-4 w-4" /> Inicio</Button>
+      <Button size="sm" variant="ghost" onClick={() => setWorkspaceView('records')} className={workspaceView === 'records' ? 'bg-[#eef1e6] text-[#3c5a20]' : ''}><Search className="h-4 w-4" /> Minutas</Button>
       <Button size="sm" variant="ghost" onClick={() => { prefilledClient.current = null; setEditingId(null); setDraft(blankMinute()); setWorkspaceView('records'); }}><FilePlus2 className="h-4 w-4" /> Nueva minuta</Button>
       <Button size="sm" variant="ghost" onClick={() => { setUnlocked(false); setPassword(''); setRecords([]); }}><LogOut className="h-4 w-4" /> Cerrar sesión</Button>
     </nav>
   </div>;
 
   if (workspaceView === 'home') return <div className="space-y-5">{navigation}
-    <section className="relative overflow-hidden rounded-3xl bg-[#2f501d] p-8 text-white shadow-lg sm:p-12" style={{ backgroundImage: 'linear-gradient(90deg, #203814f5, #6b5a17d9)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e3d38a]">Condominio Rústico Capulí</p>
+    <section className="relative overflow-hidden rounded-3xl bg-[#2f4817] p-8 text-white shadow-lg sm:p-12" style={{ backgroundImage: 'linear-gradient(90deg, #17250cf5, #5b3b15d9)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#eadca4]">Condominio Rústico Capulí</p>
       <h2 className="brand-display mt-4 max-w-xl text-4xl">Convierte los datos del cliente en un borrador de minuta.</h2>
       <p className="mt-3 max-w-xl text-sm leading-6 text-white/80">Completa compradores, verifica importes y genera un Word de trabajo para revisión legal.</p>
-      <Button className="mt-6 bg-[#bcefeb] text-[#21314a] hover:bg-white" onClick={() => { setEditingId(null); setDraft(blankMinute()); setWorkspaceView('records'); }}><FilePlus2 className="h-4 w-4" /> Crear nueva minuta</Button>
+      <Button className="mt-6 bg-[#eadca4] text-[#172012] hover:bg-white" onClick={() => { setEditingId(null); setDraft(blankMinute()); setWorkspaceView('records'); }}><FilePlus2 className="h-4 w-4" /> Crear nueva minuta</Button>
     </section>
-    <div className="grid gap-4 sm:grid-cols-2"><Card><CardHeader><CardTitle>{records.length} minutas guardadas</CardTitle></CardHeader><CardContent><Button variant="outline" onClick={() => setWorkspaceView('records')}>Ver expedientes</Button></CardContent></Card><Card><CardHeader><CardTitle>Documento para revisión</CardTitle></CardHeader><CardContent className="text-sm text-[#697386]">Cada Word requiere comprobación de datos y una plantilla contractual aprobada.</CardContent></Card></div>
+    <div className="grid gap-4 sm:grid-cols-2"><Card><CardHeader><CardTitle>{records.length} minutas guardadas</CardTitle></CardHeader><CardContent><Button variant="outline" onClick={() => setWorkspaceView('records')}>Ver expedientes</Button></CardContent></Card><Card><CardHeader><CardTitle>Documento para revisión</CardTitle></CardHeader><CardContent className="text-sm text-[#667060]">Cada Word requiere comprobación de datos y una plantilla contractual aprobada.</CardContent></Card></div>
   </div>;
 
   return <div className="space-y-5">
     {navigation}
-    <section className="rounded-3xl bg-[#2f501d] px-6 py-7 text-white shadow-lg">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffbe72]">Documentos comerciales</p>
+    <section className="rounded-3xl bg-[#2f4817] px-6 py-7 text-white shadow-lg">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c49a22]">Documentos comerciales</p>
       <h1 className="brand-display mt-2 text-3xl">Minutas de Capulí</h1>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Registra compradores, pagos iniciales y cronograma. El Word generado es un borrador para revisión contractual y firma autorizada.</p>
     </section>
     <div className="grid gap-5 xl:grid-cols-[270px_minmax(0,1fr)]">
-      <Card className="h-fit border-[#d9ddd9] bg-[#fffefb]">
+      <Card className="h-fit border-[#dfe3d8] bg-[#fffefa]">
         <CardHeader className="pb-3"><CardTitle className="text-lg">Expedientes</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-[#697386]" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Buscar minuta" className="pl-9" /></div>
+          <div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-[#667060]" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Buscar minuta" className="pl-9" /></div>
           {canEdit && <Button variant="outline" className="w-full" onClick={() => { prefilledClient.current = null; setEditingId(null); setDraft(blankMinute()); }}><FilePlus2 className="h-4 w-4" /> Nueva minuta</Button>}
           {loadError && <p role="alert" className="text-sm text-rose-700">{loadError}</p>}
-          {!loadError && !visibleRecords.length && <p className="text-sm text-[#697386]">Aún no hay borradores guardados.</p>}
-          {visibleRecords.map(record => <button key={record.id} type="button" onClick={() => { setDraft(record.draft); setEditingId(record.id); prefilledClient.current = record.clientId; }} className={`w-full rounded-xl border p-3 text-left text-sm transition hover:border-[#54317f] ${editingId === record.id ? 'border-[#54317f] bg-[#f2ebf7]' : 'border-[#d9ddd9] bg-white'}`}>
-            <span className="block font-semibold text-[#33204f]">{record.reference}</span>
-            <span className="mt-1 block text-[#5f6878]">{record.clientName}</span>
-            <span className="mt-1 block text-xs text-[#697386]">Mz. {record.draft.block} · Lote {record.draft.lot} · {record.status}</span>
+          {!loadError && !visibleRecords.length && <p className="text-sm text-[#667060]">Aún no hay borradores guardados.</p>}
+          {visibleRecords.map(record => <button key={record.id} type="button" onClick={() => { setDraft(record.draft); setEditingId(record.id); prefilledClient.current = record.clientId; }} className={`w-full rounded-xl border p-3 text-left text-sm transition hover:border-[#2f4817] ${editingId === record.id ? 'border-[#2f4817] bg-[#f8f5eb]' : 'border-[#dfe3d8] bg-white'}`}>
+            <span className="block font-semibold text-[#17250c]">{record.reference}</span>
+            <span className="mt-1 block text-[#667060]">{record.clientName}</span>
+            <span className="mt-1 block text-xs text-[#667060]">Mz. {record.draft.block} · Lote {record.draft.lot} · {record.status}</span>
           </button>)}
         </CardContent>
       </Card>
-      <Card className="min-w-0 border-[#d9ddd9] bg-[#fffefb]">
-        <CardHeader className="border-b border-[#e9ebe7]"><CardTitle>{editingId ? 'Editar borrador' : 'Nueva minuta'}</CardTitle><p className="text-sm text-[#697386]">Los datos del cliente se cargan como punto de partida. Verifica cada campo antes de generar el Word.</p></CardHeader>
+      <Card className="min-w-0 border-[#dfe3d8] bg-[#fffefa]">
+        <CardHeader className="border-b border-[#e8eadf]"><CardTitle>{editingId ? 'Editar borrador' : 'Nueva minuta'}</CardTitle><p className="text-sm text-[#667060]">Los datos del cliente se cargan como punto de partida. Verifica cada campo antes de generar el Word.</p></CardHeader>
         <CardContent className="space-y-7 pt-6">
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold text-[#33204f]">1. Cliente y compradores</h2>
+            <h2 className="text-lg font-semibold text-[#17250c]">1. Cliente y compradores</h2>
             <div className="space-y-2"><Label htmlFor="minute-client">Cliente del control</Label><select id="minute-client" value={draft.clientId} onChange={event => fillFromClient(event.target.value)} className={`w-full border px-3 ${field}`}><option value="">Seleccionar cliente</option>{clients.map(client => <option key={client.id} value={client.id}>{getClientDisplayName(client)} · Mz. {client.manzana} Lote {client.lote}</option>)}</select></div>
-            {draft.buyers.map((buyer, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e4e7e2] bg-[#f8f7f4] p-4 md:grid-cols-2">
-              <div className="md:col-span-2 flex items-center justify-between"><h3 className="font-semibold text-[#33204f]">Comprador {index + 1}</h3>{draft.buyers.length > 1 && canEdit && <Button size="sm" variant="ghost" onClick={() => setValue('buyers', draft.buyers.filter((_, i) => i !== index))}>Quitar</Button>}</div>
+            {draft.buyers.map((buyer, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e5e7df] bg-[#f8f5eb] p-4 md:grid-cols-2">
+              <div className="md:col-span-2 flex items-center justify-between"><h3 className="font-semibold text-[#17250c]">Comprador {index + 1}</h3>{draft.buyers.length > 1 && canEdit && <Button size="sm" variant="ghost" onClick={() => setValue('buyers', draft.buyers.filter((_, i) => i !== index))}>Quitar</Button>}</div>
               <div><Label>Nombre completo</Label><Input value={buyer.name} onChange={event => setBuyer(index, 'name', event.target.value)} disabled={!canEdit} className={field} /></div>
               <div><Label>DNI</Label><Input value={buyer.document} onChange={event => setBuyer(index, 'document', event.target.value)} maxLength={8} disabled={!canEdit} className={field} /></div>
               <div><Label>Ocupación</Label><Input value={buyer.occupation} onChange={event => setBuyer(index, 'occupation', event.target.value)} disabled={!canEdit} className={field} /></div>
@@ -244,8 +244,8 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
             </div>)}
             {canEdit && draft.buyers.length < 10 && <Button variant="outline" onClick={() => setValue('buyers', [...draft.buyers, blankBuyer()])}><UserRoundPlus className="h-4 w-4" /> Añadir comprador</Button>}
           </section>
-          <section className="space-y-4 border-t border-[#e9ebe7] pt-6">
-            <h2 className="text-lg font-semibold text-[#33204f]">2. Lote y precio</h2>
+          <section className="space-y-4 border-t border-[#e8eadf] pt-6">
+            <h2 className="text-lg font-semibold text-[#17250c]">2. Lote y precio</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <div><Label>Tipo de lote</Label><select value={draft.propertyType} onChange={event => setValue('propertyType', event.target.value as MinuteDraft['propertyType'])} disabled={!canEdit} className={`w-full border px-3 ${field}`}><option value="lote">Lote</option><option value="macrolote">Macrolote</option></select></div>
               <div><Label>Manzana</Label><Input value={draft.block} onChange={event => setValue('block', event.target.value)} disabled={!canEdit} className={field} /></div>
@@ -254,28 +254,28 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
               <div><Label>Precio total S/</Label><Input type="number" min={0} step="0.01" value={draft.totalPrice || ''} onChange={event => setValue('totalPrice', Number(event.target.value))} disabled={!canEdit} className={field} /></div>
               <div><Label>Cuota inicial S/</Label><Input type="number" min={0} step="0.01" value={draft.initialAmount || ''} onChange={event => setValue('initialAmount', Number(event.target.value))} disabled={!canEdit} className={field} /></div>
             </div>
-            <p className="rounded-xl bg-[#f2ebf7] px-4 py-3 text-sm font-semibold text-[#54317f]">Saldo a financiar: {money(Math.max(0, draft.totalPrice - draft.initialAmount))}</p>
+            <p className="rounded-xl bg-[#f8f5eb] px-4 py-3 text-sm font-semibold text-[#2f4817]">Saldo a financiar: {money(Math.max(0, draft.totalPrice - draft.initialAmount))}</p>
           </section>
-          <section className="space-y-4 border-t border-[#e9ebe7] pt-6">
-            <h2 className="text-lg font-semibold text-[#33204f]">3. Pagos de inicial</h2>
-            <p className="text-sm text-[#697386]">Registra solo pagos verificados. La suma debe coincidir con la cuota inicial para generar el Word.</p>
-            {draft.initialPayments.map((payment, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e4e7e2] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
+          <section className="space-y-4 border-t border-[#e8eadf] pt-6">
+            <h2 className="text-lg font-semibold text-[#17250c]">3. Pagos de inicial</h2>
+            <p className="text-sm text-[#667060]">Registra solo pagos verificados. La suma debe coincidir con la cuota inicial para generar el Word.</p>
+            {draft.initialPayments.map((payment, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e5e7df] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
               <div><Label>Fecha</Label><Input type="date" value={payment.date} onChange={event => setPayment(index, 'date', event.target.value)} disabled={!canEdit} className={field} /></div>
               <div><Label>Medio</Label><select value={payment.method} onChange={event => setPayment(index, 'method', event.target.value)} disabled={!canEdit} className={`w-full border px-3 ${field}`}><option value="">Seleccionar</option>{['Yape', 'Plin', 'Depósito', 'Transferencia', 'Otro'].map(method => <option key={method} value={method}>{method}</option>)}</select></div>
               <div><Label>Monto S/</Label><Input type="number" min={0} step="0.01" value={payment.amount || ''} onChange={event => setPayment(index, 'amount', Number(event.target.value))} disabled={!canEdit} className={field} /></div>
               {canEdit && <Button size="sm" variant="ghost" className="self-end" onClick={() => setValue('initialPayments', draft.initialPayments.filter((_, i) => i !== index))}>Quitar</Button>}
             </div>)}
             {canEdit && <Button variant="outline" onClick={() => setValue('initialPayments', [...draft.initialPayments, { date: today(), method: '', amount: 0 }])}>Añadir pago</Button>}
-            <p className="text-sm text-[#697386]">Registrado: {money(draft.initialPayments.reduce((sum, item) => sum + (item.amount || 0), 0))} / {money(draft.initialAmount)}</p>
+            <p className="text-sm text-[#667060]">Registrado: {money(draft.initialPayments.reduce((sum, item) => sum + (item.amount || 0), 0))} / {money(draft.initialAmount)}</p>
           </section>
-          <section className="space-y-4 border-t border-[#e9ebe7] pt-6">
-            <h2 className="text-lg font-semibold text-[#33204f]">4. Financiamiento y revisión</h2>
+          <section className="space-y-4 border-t border-[#e8eadf] pt-6">
+            <h2 className="text-lg font-semibold text-[#17250c]">4. Financiamiento y revisión</h2>
             <div className="grid gap-3 sm:grid-cols-2"><div><Label>Número total de cuotas</Label><Input type="number" min={1} max={240} value={draft.installments || ''} onChange={event => setValue('installments', Number(event.target.value))} disabled={!canEdit} className={field} /></div><div><Label>Primera fecha de vencimiento</Label><Input type="date" value={draft.firstDueDate} onChange={event => setValue('firstDueDate', event.target.value)} disabled={!canEdit} className={field} /></div></div>
-            {schedule.length > 0 && <div className="max-h-64 overflow-y-auto rounded-xl border border-[#d9ddd9]"><table className="w-full text-sm"><thead className="sticky top-0 bg-[#f2ebf7] text-[#33204f]"><tr><th className="p-2 text-left">Cuota</th><th className="p-2 text-left">Vencimiento</th><th className="p-2 text-right">Monto</th></tr></thead><tbody>{schedule.map(item => <tr key={item.number} className="border-t"><td className="p-2">{item.number}</td><td className="p-2">{formatDate(item.dueDate)}</td><td className="p-2 text-right">{money(item.amount)}</td></tr>)}</tbody></table></div>}
+            {schedule.length > 0 && <div className="max-h-64 overflow-y-auto rounded-xl border border-[#dfe3d8]"><table className="w-full text-sm"><thead className="sticky top-0 bg-[#f8f5eb] text-[#17250c]"><tr><th className="p-2 text-left">Cuota</th><th className="p-2 text-left">Vencimiento</th><th className="p-2 text-right">Monto</th></tr></thead><tbody>{schedule.map(item => <tr key={item.number} className="border-t"><td className="p-2">{item.number}</td><td className="p-2">{formatDate(item.dueDate)}</td><td className="p-2 text-right">{money(item.amount)}</td></tr>)}</tbody></table></div>}
             <div><Label>Observaciones para revisión del documento</Label><Textarea value={draft.notes} onChange={event => setValue('notes', event.target.value)} disabled={!canEdit} rows={3} className="mt-2" /></div>
-            <div className="flex flex-wrap gap-3 border-t border-[#e9ebe7] pt-5">
+            <div className="flex flex-wrap gap-3 border-t border-[#e8eadf] pt-5">
               {canEdit && <Button variant="outline" disabled={busy} onClick={() => void handleSave()}><Save className="h-4 w-4" /> Guardar borrador</Button>}
-              <Button disabled={busy} onClick={() => void handleGenerate()} className="bg-[#54317f] text-white hover:bg-[#33204f]"><FileDown className="h-4 w-4" /> Generar Word para revisión</Button>
+              <Button disabled={busy} onClick={() => void handleGenerate()} className="bg-[#2f4817] text-white hover:bg-[#17250c]"><FileDown className="h-4 w-4" /> Generar Word para revisión</Button>
             </div>
           </section>
         </CardContent>

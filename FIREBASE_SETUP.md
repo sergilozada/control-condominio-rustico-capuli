@@ -6,6 +6,7 @@ Se recomienda un proyecto Firebase nuevo. No conviene usar el de Villa Hermosa n
 
 1. Entra a `https://console.firebase.google.com/` con la cuenta propietaria.
 2. El proyecto creado usa `controlcondominiorusticocapuli`: contiene el nombre completo y ocupa los 30 caracteres máximos permitidos por Firebase.
+   El Hosting usa el sitio secundario `control-condominio-capuli`, definido en `firebase.json`, para ofrecer una dirección más legible.
 3. Google Analytics es opcional para este control administrativo.
 4. En Configuración del proyecto → Tus apps, agrega una aplicación Web llamada `Control Condominio Rustico Capuli`.
 5. Copia los seis valores del objeto `firebaseConfig`.

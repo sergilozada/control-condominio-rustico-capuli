@@ -6,6 +6,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
+    "site": "control-condominio-capuli",
     "public": "dist",
     "ignore": [
       "firebase.json",

@@ -36,7 +36,7 @@ pnpm build
 
 ## Firebase
 
-La configuración detallada está en [FIREBASE_SETUP.md](./FIREBASE_SETUP.md). El proyecto activo es `controlcondominiorusticocapuli`; Firebase no admite espacios y limita el ID a 30 caracteres.
+La configuración detallada está en [FIREBASE_SETUP.md](./FIREBASE_SETUP.md). El proyecto activo es `controlcondominiorusticocapuli` y el sitio principal es `https://control-condominio-capuli.web.app`.
 
 No se debe copiar `.env.local` desde Villa Hermosa o San Bartolomeo. `.env.local`, `node_modules`, `.firebase` y `dist` están excluidos de Git.
 

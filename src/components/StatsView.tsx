@@ -22,25 +22,10 @@ import {
   YAxis,
 } from 'recharts';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
 import { getClientDisplayDnis, getClientDisplayName } from '@/types/client';
-
-  const fetchImageAsDataURL = async (url: string) => {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const blob = await res.blob();
-      return await new Promise<string | null>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(blob);
-      });
-    } catch (e) {
-      return null;
-    }
-  };
+import { applyPdfBrand, loadPdfLogo, PDF_COLORS, PDF_CONTENT_BOTTOM, PDF_CONTENT_TOP, pdfGeneratedAt } from '@/utils/pdfBrand';
 
 interface StatsViewProps {
   showReport?: boolean;
@@ -201,36 +186,17 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
   const exportToPDF = async () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Try to fetch and embed the logo across the top (edge-to-edge within margins)
-    let titleY = 20;
-    try {
-      const logoData = await fetchImageAsDataURL('/logo.jpeg');
-      if (logoData) {
-        try {
-          const imgProps = (doc as any).getImageProperties(logoData);
-          const imgW = pageWidth - 20; // 10mm margin each side
-          const imgH = (imgProps.height * imgW) / imgProps.width;
-          doc.addImage(logoData, 'JPEG', 10, 6, imgW, imgH);
-          titleY = 6 + imgH + 8;
-        } catch (err) {
-          console.error('Error adding logo to stats PDF:', err);
-        }
-      }
-    } catch (err) {
-      console.error('Logo fetch error', err);
-    }
+    const logoData = await loadPdfLogo();
+    const titleY = PDF_CONTENT_TOP + 5;
 
     try {
       if (showReport) {
         const report = getMonthReport(selectedMonth, selectedYear);
 
-        // Encabezado
-        doc.setFontSize(20);
-        doc.text('REPORTE MENSUAL', pageWidth / 2, titleY, { align: 'center' });
-
-        doc.setFontSize(14);
-        doc.text(`${monthNames[selectedMonth]} ${selectedYear}`, pageWidth / 2, titleY + 15, { align: 'center' });
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(...PDF_COLORS.ink);
+        doc.text('Resumen del mes', 15, titleY);
 
         // Resumen (incluye ingresos por iniciales y por contado)
         const summaryRows = [
@@ -242,22 +208,34 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
           ['Ingresos por Contado', `S/ ${report.ingresosPorContado.toFixed(2)}`]
         ];
 
-        const anyDoc = doc as jsPDF & { autoTable?: (options: any) => any };
-        let afterSummaryY = titleY + 30;
+        let afterSummaryY = titleY + 14;
 
-        if (typeof anyDoc.autoTable === 'function') {
-          anyDoc.autoTable({
-            startY: titleY + 30,
+        try {
+          autoTable(doc, {
+            startY: titleY + 8,
             head: [['Concepto', 'Valor']],
             body: summaryRows,
-            theme: 'plain',
-            styles: { fontSize: 10 },
-            columnStyles: { 0: { cellWidth: 100 }, 1: { halign: 'right' } }
+            theme: 'grid',
+            margin: { left: 15, right: 15, top: PDF_CONTENT_TOP, bottom: PDF_CONTENT_BOTTOM },
+            styles: {
+              fontSize: 9,
+              cellPadding: 3,
+              lineColor: PDF_COLORS.line,
+              textColor: PDF_COLORS.ink,
+            },
+            headStyles: {
+              fillColor: PDF_COLORS.green,
+              textColor: [255, 255, 255],
+              fontStyle: 'bold',
+            },
+            alternateRowStyles: { fillColor: PDF_COLORS.cream },
+            columnStyles: { 0: { cellWidth: 100 }, 1: { halign: 'right' } },
           });
-          afterSummaryY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 8 : titleY + 60;
-        } else {
+          afterSummaryY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 8 : titleY + 50;
+        } catch (error) {
+          console.error('Summary table error', error);
           // fallback: draw as text lines
-          let y = titleY + 30;
+          let y = titleY + 10;
           doc.setFontSize(10);
           summaryRows.forEach(([k, v]) => {
             doc.text(`${k}: ${v}`, 20, y);
@@ -306,8 +284,8 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
           // Force manual table drawing to guarantee every cell is rendered exactly
           const forceManualTable = true;
 
-          if (!forceManualTable && typeof anyDoc.autoTable === 'function') {
-            anyDoc.autoTable({
+          if (!forceManualTable) {
+            autoTable(doc, {
               startY: afterSummaryY,
               head: [['Fecha', 'Nombre', 'DNI', 'Manzana', 'Lote', 'Forma\nPago', 'Monto\nTotal', 'Inicial']],
               body: tableData,
@@ -333,7 +311,7 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
             const drawHeader = () => {
               // header background
               const headerH = Math.max(baseRowH, 12);
-              doc.setFillColor(14, 165, 233);
+              doc.setFillColor(...PDF_COLORS.green);
               doc.rect(startX, y, tableW, headerH, 'F');
               doc.setTextColor(255, 255, 255);
               doc.setFontSize(9);
@@ -411,9 +389,9 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
               const rowHeight = Math.max(baseRowH, maxLines * lineHeight + 6);
 
               // page break if needed
-              if (y + rowHeight > pageH - margin) {
+              if (y + rowHeight > pageH - PDF_CONTENT_BOTTOM) {
                 doc.addPage();
-                y = margin;
+                y = PDF_CONTENT_TOP;
                 drawHeader();
               }
 
@@ -468,12 +446,10 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
       } else {
         const stats = getMonthStats(selectedMonth, selectedYear);
 
-        // Encabezado
-        doc.setFontSize(20);
-        doc.text('ESTADÍSTICAS DE PAGOS', pageWidth / 2, titleY, { align: 'center' });
-
-        doc.setFontSize(14);
-        doc.text(`${monthNames[selectedMonth]} ${selectedYear}`, pageWidth / 2, titleY + 15, { align: 'center' });
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(...PDF_COLORS.ink);
+        doc.text('Resumen de cartera', 15, titleY);
 
         // Estadísticas: render as boxed cards (3 columns) to match UI layout
         const margin = 12;
@@ -481,20 +457,15 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
         const cols = 3;
         const cardW = (pageWidth - margin * 2 - gap * (cols - 1)) / cols;
         const cardH = 56;
-        const cardY = titleY +  thirtyFive();
-
-        // helper to keep spacing consistent
-        function thirtyFive() {
-          return 35;
-        }
+        const cardY = titleY + 8;
 
         const cards: Array<{ title: string; value: string; subtitle?: string } > = [
-          { title: 'Total Clientes', value: String(report.totalClientes) },
-          { title: 'Con Cuotas', value: String(report.clientesConCuotas) },
-          { title: 'Al Contado', value: String(report.clientesAlContado) },
-          { title: 'Total Ingresos', value: `S/ ${report.totalIngresos.toFixed(2)}` },
-          { title: 'Ingresos por Iniciales', value: `S/ ${report.ingresosPorIniciales.toFixed(2)}` },
-          { title: 'Ingresos por Contado', value: `S/ ${report.ingresosPorContado.toFixed(2)}` }
+          { title: 'Total de cuotas', value: String(stats.totalCuotas) },
+          { title: 'Cuotas pagadas', value: `${stats.cuotasPagadas} (${stats.porcentajePagadas.toFixed(1)}%)` },
+          { title: 'Cuotas pendientes', value: `${stats.cuotasPendientes} (${stats.porcentajePendientes.toFixed(1)}%)` },
+          { title: 'Monto proyectado', value: `S/ ${stats.montoProyectado.toFixed(2)}` },
+          { title: 'Monto ingresado', value: `S/ ${stats.montoIngresado.toFixed(2)}` },
+          { title: 'Cuotas adelantadas', value: `${stats.cuotasAdelantadas} · S/ ${stats.montoAdelantadas.toFixed(2)}` }
         ];
 
         // Draw rows of cards
@@ -507,22 +478,22 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
           const y = cardY + row * (cardH + gap);
 
           // Card background
-          doc.setFillColor(250, 250, 250);
+          doc.setFillColor(...PDF_COLORS.cream);
           doc.rect(x, y, cardW, cardH, 'F');
 
           // Value (big)
           doc.setFontSize(16);
-          doc.setTextColor(23, 23, 23);
+          doc.setTextColor(...PDF_COLORS.ink);
           // center-left align value near top-left with padding
           doc.text(c.value, x + 8, y + 20);
 
           // Title (small)
           doc.setFontSize(10);
-          doc.setTextColor(100, 100, 100);
+          doc.setTextColor(...PDF_COLORS.muted);
           doc.text(c.title, x + 8, y + 36);
 
           // Card border
-          doc.setDrawColor(220, 220, 220);
+          doc.setDrawColor(...PDF_COLORS.line);
           doc.rect(x, y, cardW, cardH, 'S');
         }
       }
@@ -531,6 +502,12 @@ export default function StatsView({ showReport = false }: StatsViewProps) {
       toast.error('Ocurrió un error al generar el PDF. Revisa la consola.');
     } finally {
       try {
+        applyPdfBrand(doc, {
+          title: showReport ? 'Reporte mensual' : 'Estadísticas de pagos',
+          subtitle: `${monthNames[selectedMonth]} ${selectedYear} · ${pdfGeneratedAt()}`,
+          logo: logoData,
+          footerLabel: showReport ? 'Reporte mensual' : 'Estadísticas de pagos',
+        });
         doc.save(`${showReport ? 'reporte' : 'estadisticas'}_${monthNames[selectedMonth]}_${selectedYear}.pdf`);
         toast.success('PDF descargado exitosamente');
       } catch (err) {

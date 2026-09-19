@@ -32,6 +32,7 @@ import { getClientDisplayDnis, getClientDisplayName, getClientTitulares } from '
 import { canManageClients, canManageMinutes, canManageReceipts, canRegisterPayments } from '@/config/permissions';
 import MinutaUploadButton from '@/components/MinutaUploadButton';
 import { NoDebtCertificateButton, ResolutionDraftButton } from '@/components/ClientDocuments';
+import { applyPdfBrand, loadPdfLogo, PDF_COLORS, PDF_CONTENT_BOTTOM, PDF_CONTENT_TOP } from '@/utils/pdfBrand';
 
 interface ClientListProps {
   filterType?: 'pending' | 'overdue' | 'all';
@@ -733,88 +734,28 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
   const exportToPDF = (client: Client) => {
     (async () => {
       const doc = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = 210;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const brandLogo = await loadPdfLogo();
       const scheduleSections = getPaymentScheduleSections(client);
       if (scheduleSections.length === 0) {
         toast.error('El cliente no tiene cuotas para exportar');
         return;
       }
-      // Try to fetch logo and embed as base64
-      const fetchImageAsDataURL = async (url: string) => {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) return null;
-          const blob = await res.blob();
-          return await new Promise<string | null>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(blob);
-          });
-        } catch (e) {
-          return null;
-        }
-      };
-
       for (let sectionIndex = 0; sectionIndex < scheduleSections.length; sectionIndex += 1) {
         const section = scheduleSections[sectionIndex];
         const scheduleConfig = section.config;
         const sectionCuotas = section.installments;
         if (sectionIndex > 0) doc.addPage();
 
-      let logoData: Array<string | null> = [];
-      try {
-        logoData = await Promise.all(scheduleConfig.logoUrls.map(fetchImageAsDataURL));
-      } catch (err) {
-        console.error('Error fetching schedule logos:', err);
-        logoData = scheduleConfig.logoUrls.map(() => null);
-      }
-
-      // The legacy layout remains untouched for existing clients. New clients
-      // El cronograma de Capulí usa un logotipo institucional ancho.
-      let titleY = 20;
-      if (scheduleConfig.logoLayout === 'paired-square') {
-        const logoSize = 46;
-        const logoTop = 5;
-        const logoSideMargin = 5;
-        const logoPositions = [
-          logoSideMargin,
-          pageWidth - logoSideMargin - logoSize
-        ];
-
-        logoData.forEach((imageData, index) => {
-          if (!imageData) return;
-          try {
-            doc.addImage(imageData, 'JPEG', logoPositions[index], logoTop, logoSize, logoSize);
-          } catch (err) {
-            console.error(`Error adding schedule logo ${index + 1} to PDF:`, err);
-          }
-        });
-        titleY = logoTop + logoSize + 6;
-      } else if (logoData[0]) {
-        try {
-          const imgProps = doc.getImageProperties(logoData[0]);
-          const imgW = pageWidth - 20; // 10mm margin each side
-          const imgH = (imgProps.height * imgW) / imgProps.width;
-          doc.addImage(logoData[0], 'JPEG', 10, 6, imgW, imgH);
-          titleY = 6 + imgH + 6;
-        } catch (err) {
-          console.error('Error adding logo to PDF:', err);
-          titleY = 20;
-        }
-      }
-
-      // Title
-      doc.setFontSize(16);
-      doc.text('CRONOGRAMA DE PAGOS', pageWidth / 2, titleY, { align: 'center' });
-
-      // Contact bar under title
-      const contactY = titleY + 6;
-      doc.setFontSize(10);
-      doc.setFillColor(255, 205, 0);
-      doc.rect(20, contactY - 4, pageWidth - 40, 6, 'F');
-      doc.setTextColor(0);
-      doc.text(`Teléfono de cobranza Capulí: ${scheduleConfig.cobranzaPhone}`, 25, contactY);
+      // Contact bar under the branded header.
+      const contactY = PDF_CONTENT_TOP + 7;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setFillColor(...PDF_COLORS.goldLight);
+      doc.roundedRect(15, contactY - 5, pageWidth - 30, 9, 2, 2, 'F');
+      doc.setTextColor(...PDF_COLORS.forest);
+      doc.text(`Cobranza Capulí: ${scheduleConfig.cobranzaPhone}`, 20, contactY + 0.5);
+      doc.setFont('helvetica', 'normal');
 
   // Client info block (left) and bank info block (right)
       const infoStartY = contactY + 8;
@@ -871,7 +812,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
   let boxX = rightX + 8; // move box a bit to the right
     // ensure the box doesn't overflow the right margin
     if (boxX + boxWidth > pageWidth - 10) boxX = pageWidth - 10 - boxWidth;
-    doc.setFillColor(200, 230, 201);
+    doc.setFillColor(...PDF_COLORS.cream);
     doc.rect(boxX, bankY - 2, boxWidth, boxHeight, 'F');
     // draw bank lines inside box
     let yBank = bankY + bankPad;
@@ -892,9 +833,9 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         return [
           cuota.numero === 0 ? 'Inicial' : String(cuota.numero),
           formatDate(cuota.vencimiento),
-          cuota.monto.toFixed(2),
-          moraDisplayed.toFixed(2),
-          totalForRow.toFixed(2),
+          cuota.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          moraDisplayed.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          totalForRow.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
           cuota.fechaPago ? formatDate(cuota.fechaPago) : '',
           cuota.estado,
           Array.isArray(cuota.voucher) ? String(cuota.voucher.length) : (cuota.voucher ? '1' : ''),
@@ -907,20 +848,23 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       try {
         autoTable(doc, {
           startY: tableStartY,
-          margin: { left: 20, right: 20 },
-          head: [['N°','vencimiento','Monto','Mora','Total','Fecha de Pago','Estado','Vouchers','Boletas']],
+          margin: { left: 20, right: 20, top: PDF_CONTENT_TOP, bottom: PDF_CONTENT_BOTTOM },
+          head: [['N°','Vencimiento','Monto (S/)','Mora (S/)','Total (S/)','Pago','Estado','Vouch.','Bol.']],
           body: rows,
           theme: 'grid',
-          styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [0,102,204], textColor: 255 },
-          alternateRowStyles: { fillColor: [245,245,245] },
+          headStyles: { fillColor: PDF_COLORS.green, textColor: 255, fontStyle: 'bold', halign: 'center' },
+          alternateRowStyles: { fillColor: PDF_COLORS.cream },
+          styles: { fontSize: 7.5, cellPadding: 2, lineColor: PDF_COLORS.line, textColor: PDF_COLORS.ink, valign: 'middle' },
           columnStyles: {
-            1: { cellWidth: 26 },
-            2: { cellWidth: 18 },
-            5: { cellWidth: 24 },
-            6: { cellWidth: 20 },
-            7: { cellWidth: 18 },
-            8: { cellWidth: 14 }
+            0: { cellWidth: 11, halign: 'center' },
+            1: { cellWidth: 24, halign: 'center' },
+            2: { cellWidth: 21, halign: 'right' },
+            3: { cellWidth: 17, halign: 'right' },
+            4: { cellWidth: 22, halign: 'right' },
+            5: { cellWidth: 24, halign: 'center' },
+            6: { cellWidth: 20, halign: 'center' },
+            7: { cellWidth: 16, halign: 'center' },
+            8: { cellWidth: 15, halign: 'center' }
           }
         });
         tableEndY = (doc.lastAutoTable?.finalY ?? tableStartY) + 6;
@@ -934,7 +878,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           const parts = doc.splitTextToSize(line, pageWidth - 40);
           doc.text(parts, 20, y);
           y += (parts.length * 6) + 2;
-          if (y > 270) { doc.addPage(); y = 20; }
+          if (y > 258) { doc.addPage(); y = PDF_CONTENT_TOP; }
         });
         tableEndY = y + 4;
       }
@@ -945,7 +889,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         const pageH = doc.internal.pageSize.getHeight();
         if (footerY + 30 > pageH - 10) {
           doc.addPage();
-          footerY = 20;
+          footerY = PDF_CONTENT_TOP;
         }
         doc.setFontSize(10);
         // Compute totals using the same displayed values shown in the modal table:
@@ -965,9 +909,9 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         doc.text(`Importe pendiente S/ ${totalPendiente.toFixed(2)}`, 20, footerY + 6);
         // small green strip below totals
         // Draw totals
-        doc.setFillColor(220, 240, 220);
+        doc.setFillColor(...PDF_COLORS.cream);
         // NOTE: draw the green box exactly around the note text (with padding)
-        const noteText = `NOTA: UNA VEZ CANCELADO LA CUOTA MENSUAL, ENVIAR FOTO DEL VOUCHER AL NUMERO DE COBRANZA: ${scheduleConfig.cobranzaPhone}`;
+        const noteText = `NOTA: UNA VEZ CANCELADA LA CUOTA MENSUAL, ENVÍE LA FOTO DEL VOUCHER AL NÚMERO DE COBRANZA: ${scheduleConfig.cobranzaPhone}`;
         const noteFontSize = 8; // smaller font to ensure fit
         doc.setFontSize(noteFontSize);
         // split note into lines that fit inside the content width
@@ -978,7 +922,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         const boxHeight = (noteLines.length * lineHeight) + (boxPadding * 2);
         const boxX = 15;
         const boxY = footerY + 10;
-        doc.setFillColor(220, 240, 220);
+        doc.setFillColor(...PDF_COLORS.cream);
         doc.rect(boxX, boxY, contentWidth + (boxPadding * 2) - 2, boxHeight, 'F');
         doc.setTextColor(0);
         // draw note lines inside the box with a small left padding
@@ -991,6 +935,13 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
         console.error('PDF footer error', err);
       }
       }
+
+      applyPdfBrand(doc, {
+        title: 'Cronograma de pagos',
+        subtitle: `${getClientDisplayName(client)} · Mz. ${client.manzana}, Lote ${client.lote}`,
+        logo: brandLogo,
+        footerLabel: 'Cronograma de pagos',
+      });
 
       try {
         doc.save(`cronograma_${client.nombre1}_${client.dni1}.pdf`);
@@ -1173,13 +1124,14 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
     }, { totalPagado: 0, totalPendiente: 0 });
   };
 
-  const exportClientsToPDF = () => {
+  const exportClientsToPDF = async () => {
     if (filteredClients.length === 0) {
       toast.error('No hay clientes para descargar.');
       return;
     }
 
     try {
+      const brandLogo = await loadPdfLogo();
       if (filterType === 'overdue') {
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const generatedAt = new Date().toLocaleString('es-PE');
@@ -1191,23 +1143,8 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           ? 'Todas las cantidades'
           : `${overdueCountFilter} cuota${overdueCountFilter === '1' ? '' : 's'} atrasada${overdueCountFilter === '1' ? '' : 's'}`;
 
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(17);
-        doc.setTextColor(21, 40, 77);
-        doc.text('REPORTE DE CLIENTES CON CUOTAS ATRASADAS', 10, 15);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        doc.setTextColor(95, 104, 120);
-        doc.text(`Generado: ${generatedAt} | Clientes: ${filteredClients.length}`, 10, 22);
-        doc.text(`Filtros aplicados: ${monthFilterLabel} | ${countFilterLabel}`, 10, 27);
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10.5);
-        doc.setTextColor(13, 111, 120);
-        doc.text('CLIENTES, LOTES Y ESTADO DE PAGOS', 10, 35);
-
         autoTable(doc, {
-          startY: 39,
+          startY: PDF_CONTENT_TOP,
           head: [[
             'ID', 'Nombres', 'DNIs', 'Celulares', 'Emails', 'Manzana', 'Lote', 'Metraje',
             'Precio de lote', 'Forma de pago', 'Inicial', 'Cuotas', 'Cuotas atrasadas', 'Debe'
@@ -1229,9 +1166,9 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
             getClientStatus(client)
           ]),
           theme: 'grid',
-          styles: { fontSize: 5.8, cellPadding: 1, overflow: 'linebreak', valign: 'middle' },
-          headStyles: { fillColor: [13, 111, 120], textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 5.8 },
-          alternateRowStyles: { fillColor: [240, 250, 247] },
+          styles: { fontSize: 5.8, cellPadding: 1, overflow: 'linebreak', valign: 'middle', textColor: PDF_COLORS.ink, lineColor: PDF_COLORS.line },
+          headStyles: { fillColor: PDF_COLORS.green, textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 5.8 },
+          alternateRowStyles: { fillColor: PDF_COLORS.cream },
           columnStyles: {
             0: { cellWidth: 7, halign: 'center' },
             1: { cellWidth: 32 },
@@ -1248,7 +1185,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
             12: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
             13: { cellWidth: 16, halign: 'center', fontStyle: 'bold' }
           },
-          margin: { top: 14, right: 10, bottom: 15, left: 10 },
+          margin: { top: PDF_CONTENT_TOP, right: 10, bottom: PDF_CONTENT_BOTTOM, left: 10 },
           rowPageBreak: 'avoid'
         });
 
@@ -1257,34 +1194,29 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           (total, client) => total + getOverdueInstallmentCount(client),
           0
         );
-        let summaryY = (doc.lastAutoTable?.finalY || 39) + 8;
-        if (summaryY > pageHeight - 22) {
+        let summaryY = (doc.lastAutoTable?.finalY || PDF_CONTENT_TOP) + 8;
+        if (summaryY > pageHeight - 32) {
           doc.addPage();
-          summaryY = 20;
+          summaryY = PDF_CONTENT_TOP;
         }
-        doc.setFillColor(255, 247, 237);
-        doc.setDrawColor(253, 186, 116);
+        doc.setFillColor(...PDF_COLORS.cream);
+        doc.setDrawColor(...PDF_COLORS.gold);
         doc.roundedRect(10, summaryY, 110, 12, 2, 2, 'FD');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(9);
-        doc.setTextColor(154, 52, 18);
+        doc.setTextColor(...PDF_COLORS.green);
         doc.text(
           `Total: ${filteredClients.length} cliente${filteredClients.length === 1 ? '' : 's'} | ${totalOverdueInstallments} cuota${totalOverdueInstallments === 1 ? '' : 's'} atrasada${totalOverdueInstallments === 1 ? '' : 's'}`,
           15,
           summaryY + 7.5
         );
 
-        const totalPages = doc.getNumberOfPages();
-        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
-          doc.setPage(pageNumber);
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const currentPageHeight = doc.internal.pageSize.getHeight();
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7);
-          doc.setTextColor(105, 115, 130);
-          doc.text('Condominio Rústico Capulí', 10, currentPageHeight - 6);
-          doc.text(`Pagina ${pageNumber} de ${totalPages}`, pageWidth - 10, currentPageHeight - 6, { align: 'right' });
-        }
+        applyPdfBrand(doc, {
+          title: 'Reporte de clientes con cuotas atrasadas',
+          subtitle: `${monthFilterLabel} · ${countFilterLabel} · ${generatedAt}`,
+          logo: brandLogo,
+          footerLabel: 'Seguimiento de cartera vencida',
+        });
 
         doc.save(`reporte_atrasados_${new Date().toISOString().slice(0, 10)}.pdf`);
         toast.success('Reporte de atrasados descargado en PDF.');
@@ -1309,15 +1241,6 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
 
       const totals = calculateGroupTotals(filteredClients);
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.setTextColor(30, 64, 175);
-      doc.text('REPORTE GENERAL DE CLIENTES', 14, 16);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(80);
-      doc.text(`Generado: ${generatedAt} | Total de clientes: ${filteredClients.length}`, 14, 23);
-
       const renderClientGroup = (
         title: string,
         group: Client[],
@@ -1326,7 +1249,7 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       ) => {
         if (addPage) doc.addPage();
 
-        const startY = addPage ? 18 : 34;
+        const startY = PDF_CONTENT_TOP;
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(13);
         doc.setTextColor(...color);
@@ -1360,16 +1283,8 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           theme: 'grid',
           styles: { fontSize: 6.5, cellPadding: 1.4, overflow: 'linebreak', valign: 'middle' },
           headStyles: { fillColor: color, textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [241, 245, 249] },
-          margin: { top: 14, right: 10, bottom: 16, left: 10 },
-          didDrawPage: () => {
-          const pageNumber = doc.getNumberOfPages();
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const pageHeight = doc.internal.pageSize.getHeight();
-          doc.setFontSize(7);
-          doc.setTextColor(100);
-          doc.text(`Página ${pageNumber}`, pageWidth - 10, pageHeight - 7, { align: 'right' });
-          }
+          alternateRowStyles: { fillColor: PDF_COLORS.cream },
+          margin: { top: PDF_CONTENT_TOP, right: 10, bottom: PDF_CONTENT_BOTTOM, left: 10 },
         });
 
         const groupTotals = calculateGroupTotals(group);
@@ -1384,23 +1299,23 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           ]],
           theme: 'grid',
           styles: { fontSize: 8, cellPadding: 2, fontStyle: 'bold' },
-          bodyStyles: { fillColor: [248, 250, 252], textColor: color },
-          margin: { left: 10, right: 10, bottom: 16 }
+          bodyStyles: { fillColor: PDF_COLORS.cream, textColor: color },
+          margin: { left: 10, right: 10, top: PDF_CONTENT_TOP, bottom: PDF_CONTENT_BOTTOM }
         });
       };
 
       if (financedClients.length > 0) {
-        renderClientGroup('CLIENTES FINANCIADOS', financedClients, [30, 64, 175], false);
+        renderClientGroup('CLIENTES FINANCIADOS', financedClients, PDF_COLORS.green, false);
       }
       if (cashClients.length > 0) {
-        renderClientGroup('CLIENTES AL CONTADO', cashClients, [5, 150, 105], financedClients.length > 0);
+        renderClientGroup('CLIENTES AL CONTADO', cashClients, PDF_COLORS.olive, financedClients.length > 0);
       }
 
       doc.addPage();
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(15);
-      doc.setTextColor(22, 101, 52);
-      doc.text('RESUMEN GENERAL', 10, 18);
+      doc.setTextColor(...PDF_COLORS.green);
+      doc.text('RESUMEN GENERAL', 10, PDF_CONTENT_TOP);
 
       const summaryRows = [
         ['Total de clientes', String(filteredClients.length)],
@@ -1412,13 +1327,13 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
       ];
 
       autoTable(doc, {
-        startY: 24,
+        startY: PDF_CONTENT_TOP + 6,
         head: [['RESUMEN GENERAL', 'IMPORTE']],
         body: summaryRows,
         theme: 'grid',
-        margin: { left: 10, bottom: 16 },
+        margin: { left: 10, top: PDF_CONTENT_TOP, bottom: PDF_CONTENT_BOTTOM },
         styles: { fontSize: 9, cellPadding: 2.5 },
-        headStyles: { fillColor: [22, 101, 52], textColor: 255, fontStyle: 'bold' },
+        headStyles: { fillColor: PDF_COLORS.green, textColor: 255, fontStyle: 'bold' },
         columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } },
         didParseCell: (data: {
           section: string;
@@ -1426,17 +1341,17 @@ export default function ClientList({ filterType = 'all', onCreateMinute }: Clien
           cell: { styles: { fillColor: number[]; fontStyle: string } };
         }) => {
           if (data.section === 'body' && data.row.index >= 4) {
-            data.cell.styles.fillColor = data.row.index === 4 ? [220, 252, 231] : [254, 226, 226];
+            data.cell.styles.fillColor = data.row.index === 4 ? PDF_COLORS.cream : PDF_COLORS.goldLight;
             data.cell.styles.fontStyle = 'bold';
           }
-        },
-        didDrawPage: () => {
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const pageHeight = doc.internal.pageSize.getHeight();
-          doc.setFontSize(7);
-          doc.setTextColor(100);
-          doc.text(`Página ${doc.getNumberOfPages()}`, pageWidth - 10, pageHeight - 7, { align: 'right' });
         }
+      });
+
+      applyPdfBrand(doc, {
+        title: 'Reporte general de clientes',
+        subtitle: `${filteredClients.length} clientes · ${generatedAt}`,
+        logo: brandLogo,
+        footerLabel: 'Cartera de clientes',
       });
 
       doc.save(`reporte_clientes_${new Date().toISOString().slice(0, 10)}.pdf`);

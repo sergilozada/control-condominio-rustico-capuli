@@ -12,6 +12,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Titular } from '@/types/client';
 import { getClientDisplayDnis, getClientDisplayName } from '@/types/client';
+import { applyPdfBrand, loadPdfLogo, PDF_COLORS, PDF_CONTENT_BOTTOM, PDF_CONTENT_TOP, pdfGeneratedAt } from '@/utils/pdfBrand';
 
 type JsPDFWithAutoTable = jsPDF & {
   lastAutoTable?: {
@@ -126,7 +127,7 @@ export default function DelinquentClientsReport() {
       .sort((a, b) => b.overdueCuotasCount - a.overdueCuotasCount); // Ordenar por cantidad descendente
   };
 
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async () => {
     try {
       const delinquent = getDelinquentClients();
 
@@ -140,20 +141,7 @@ export default function DelinquentClientsReport() {
         unit: 'mm',
         format: 'A4',
       }) as JsPDFWithAutoTable;
-
-      // Título
-      pdf.setFontSize(16);
-      pdf.text(`Reporte de Clientes Deudores (${getFilterLabel()})`, 14, 15);
-
-      // Fecha de generación
-      pdf.setFontSize(10);
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('es-PE', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-      pdf.text(`Generado: ${dateStr}`, 14, 22);
+      const logo = await loadPdfLogo();
 
       // Tabla con datos
       const tableData = delinquent.map((item) => [
@@ -172,16 +160,16 @@ export default function DelinquentClientsReport() {
       autoTable(pdf, {
         head: [['Cliente', 'DNI', 'Celular', 'Email', 'Manzana', 'Lote', 'Cuotas Atrasadas', 'Monto Total']],
         body: tableData,
-        startY: 28,
+        startY: PDF_CONTENT_TOP,
         headStyles: {
-          fillColor: [41, 128, 185],
+          fillColor: PDF_COLORS.green,
           textColor: 255,
           fontStyle: 'bold',
           halign: 'center',
           fontSize: 11,
         },
         bodyStyles: {
-          textColor: 0,
+          textColor: PDF_COLORS.ink,
           halign: 'left',
           fontSize: 10,
         },
@@ -195,24 +183,27 @@ export default function DelinquentClientsReport() {
           6: { halign: 'center', cellWidth: 25 },
           7: { halign: 'right', cellWidth: 35 },
         },
-        margin: { top: 10, right: 10, bottom: 15, left: 10 },
-        didDrawPage: (data) => {
-          // Footer
-          const pageSize = pdf.internal.pageSize;
-          const pageHeight = pageSize.getHeight();
-          pdf.setFontSize(8);
-          pdf.text(`Total de clientes deudores: ${delinquent.length}`, 14, pageHeight - 10);
-          
-          // Número de página
-          const pageCount = pdf.internal.getNumberOfPages?.() || 1;
-          const pageNumber = data.pageNumber || 1;
-          pdf.text(`Página ${pageNumber} de ${pageCount}`, pageSize.getWidth() - 25, pageHeight - 10);
-        },
+        alternateRowStyles: { fillColor: PDF_COLORS.cream },
+        styles: { lineColor: PDF_COLORS.line, lineWidth: 0.1 },
+        margin: { top: PDF_CONTENT_TOP, right: 10, bottom: PDF_CONTENT_BOTTOM, left: 10 },
       });
 
-      const finalY = pdf.lastAutoTable?.finalY || 28;
+      let finalY = pdf.lastAutoTable?.finalY || PDF_CONTENT_TOP;
+      if (finalY > pdf.internal.pageSize.getHeight() - 32) {
+        pdf.addPage();
+        finalY = PDF_CONTENT_TOP;
+      }
       pdf.setFontSize(11);
-      pdf.text(`Total general de deuda: S/ ${totalOverdueSum.toFixed(2)}`, 14, finalY + 10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...PDF_COLORS.green);
+      pdf.text(`Clientes deudores: ${delinquent.length} · Total general: S/ ${totalOverdueSum.toFixed(2)}`, 14, finalY + 10);
+
+      applyPdfBrand(pdf, {
+        title: 'Reporte de clientes deudores',
+        subtitle: `${getFilterLabel()} · ${pdfGeneratedAt()}`,
+        logo,
+        footerLabel: 'Seguimiento de cartera vencida',
+      });
 
       pdf.save('reporte_clientes_deudores.pdf');
       toast.success('Reporte descargado correctamente');

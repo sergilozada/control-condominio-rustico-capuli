@@ -166,24 +166,84 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   };
 
   if (!canManageMinutes(user?.role)) return <div className="rounded-2xl border bg-white p-8 text-center">El acceso a Minutas corresponde al administrador y al área legal.</div>;
-  if (!unlocked) return <div className="mx-auto grid min-h-[65vh] max-w-5xl overflow-hidden rounded-3xl border border-[#dfe4d6] bg-white shadow-xl lg:grid-cols-2">
-    <section className="flex flex-col justify-end bg-[#2f4817] p-8 text-white sm:p-10" style={{ backgroundImage: 'linear-gradient(135deg, #17250cf2, #5b3b15de)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <img src="/brand/capuli-logo.png" alt="Condominio Rústico Capulí" className="mb-auto h-24 w-64 rounded-xl bg-white object-contain p-2" />
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#eadca4]">Área legal</p>
-      <h1 className="brand-display mt-3 text-4xl">Minutas de Capulí</h1>
-      <p className="mt-3 max-w-md text-sm leading-6 text-white/85">Accede al expediente de compradores, pagos y borradores para revisión.</p>
+  if (!unlocked) return <div
+    className="vh-login-shell-enter grid min-h-[calc(100dvh-8.5rem)] w-full overflow-hidden rounded-[2rem] border border-[#dfe4d6] bg-[#fffefa] shadow-2xl shadow-[#17250c]/15 xl:grid-cols-[minmax(0,1.25fr)_minmax(410px,0.75fr)]"
+    aria-labelledby="minute-login-title"
+  >
+    <section
+      className="relative isolate hidden min-h-[calc(100dvh-8.5rem)] flex-col justify-between overflow-hidden bg-[#17250c] p-10 text-white xl:flex 2xl:p-14"
+      aria-label="Minutas de Condominio Rústico Capulí"
+    >
+      <div
+        className="absolute inset-0 -z-20"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 88% 12%, rgba(203,157,27,.32), transparent 23rem), radial-gradient(circle at 5% 95%, rgba(101,132,64,.32), transparent 25rem), linear-gradient(145deg, #17250c 0%, #2f4817 60%, #76551f 130%)',
+        }}
+        aria-hidden="true"
+      />
+      <div className="absolute -right-32 top-32 -z-10 h-[34rem] w-[34rem] rounded-full border border-white/10" aria-hidden="true" />
+      <div className="absolute -right-16 top-48 -z-10 h-[25rem] w-[25rem] rounded-full border border-white/10" aria-hidden="true" />
+
+      <div className="w-fit max-w-[380px] overflow-hidden rounded-2xl bg-white p-3 shadow-2xl shadow-black/20">
+        <img src="/brand/capuli-logo.png" alt="Condominio Rústico Capulí" className="h-28 w-[356px] object-contain object-center" />
+      </div>
+
+      <div className="max-w-2xl py-10">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#eadca4]">Gestión legal inmobiliaria</p>
+        <h1 className="brand-display mt-5 max-w-xl text-5xl font-medium leading-[1.05] tracking-tight 2xl:text-6xl">Documentos listos para revisión.</h1>
+        <p className="mt-5 max-w-xl text-base leading-7 text-white/80 2xl:text-lg">
+          Centraliza compradores, pagos iniciales y cronogramas para preparar cada borrador de minuta con mayor claridad.
+        </p>
+      </div>
+
+      <div className="grid max-w-3xl grid-cols-3 gap-3" aria-label="Funciones principales">
+        {[
+          ['01', 'Datos conectados'],
+          ['02', 'Validación guiada'],
+          ['03', 'Historial seguro'],
+        ].map(([number, label]) => <div key={number} className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+          <span className="block text-xs font-bold tracking-[0.16em] text-[#eadca4]">{number}</span>
+          <span className="mt-2 block text-sm font-semibold text-white/90">{label}</span>
+        </div>)}
+      </div>
     </section>
-    <section className="flex flex-col justify-center p-8 sm:p-10">
-      <LockKeyhole className="mb-5 h-10 w-10 text-[#2f4817]" />
-      <h2 className="brand-display text-3xl text-[#17250c]">Ingresar a Minutas</h2>
-      <p className="mt-2 text-sm text-[#667060]">Verifica de nuevo la contraseña de tu cuenta autorizada.</p>
-      <form onSubmit={event => void handleLogin(event)} className="mt-8 space-y-4">
-        {!preview && <><div className="space-y-2"><Label htmlFor="minute-email">Correo</Label><Input id="minute-email" type="email" value={firebaseUser?.email || ''} readOnly autoComplete="username" /></div>
-        <div className="space-y-2"><Label htmlFor="minute-password">Contraseña</Label><Input id="minute-password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></div></>}
-        {loginError && <p role="alert" className="text-sm text-rose-700">{loginError}</p>}
-        <Button type="submit" disabled={loginBusy} className="w-full bg-[#2f4817] text-white hover:bg-[#17250c]">{preview ? 'Entrar a la muestra de Minutas' : loginBusy ? 'Verificando…' : 'Ingresar a Minutas'}</Button>
-      </form>
-    </section>
+
+    <main className="grid min-h-[calc(100dvh-8.5rem)] place-items-center bg-[#fffefa] px-6 py-10 sm:px-10 xl:px-12 2xl:px-16">
+      <div className="vh-login-form-enter w-full max-w-[430px]">
+        <div className="mb-10 overflow-hidden rounded-2xl border border-[#dfe4d6] bg-white p-3 shadow-sm xl:hidden">
+          <img src="/brand/capuli-logo.png" alt="Condominio Rústico Capulí" className="h-28 w-full object-contain object-center sm:h-32" />
+        </div>
+
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef1e6] text-[#2f4817]">
+          <LockKeyhole className="h-6 w-6" aria-hidden="true" />
+        </div>
+        <p className="mt-7 text-xs font-bold uppercase tracking-[0.2em] text-[#6b7f35]">Acceso interno</p>
+        <h2 id="minute-login-title" className="brand-display mt-3 text-4xl font-medium leading-tight text-[#17250c]">Ingresar a Minutas</h2>
+        <p className="mt-3 text-base leading-6 text-[#667060]">Verifica nuevamente la contraseña de tu cuenta autorizada.</p>
+
+        <form onSubmit={event => void handleLogin(event)} className="mt-9 space-y-5">
+          {!preview && <>
+            <div className="space-y-2">
+              <Label htmlFor="minute-email" className="text-sm font-semibold text-[#17250c]">Correo corporativo</Label>
+              <Input id="minute-email" type="email" value={firebaseUser?.email || ''} readOnly autoComplete="username" className="min-h-12 rounded-xl border-[#d9ddd2] bg-[#f7f6f0] px-4 text-base text-[#56604f]" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="minute-password" className="text-sm font-semibold text-[#17250c]">Contraseña</Label>
+              <Input id="minute-password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="Ingresa tu contraseña" className="min-h-12 rounded-xl border-[#cfd5c7] bg-white px-4 text-base focus-visible:ring-[#6b7f35]" required />
+            </div>
+          </>}
+          {loginError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{loginError}</p>}
+          <Button type="submit" disabled={loginBusy || (!preview && !password)} className="min-h-12 w-full rounded-xl bg-[#2f4817] text-base font-semibold text-white shadow-lg shadow-[#2f4817]/15 hover:bg-[#17250c] disabled:shadow-none">
+            {preview ? 'Entrar a la muestra de Minutas' : loginBusy ? 'Verificando…' : 'Ingresar a Minutas'}
+          </Button>
+        </form>
+
+        <div className="mt-8 flex items-start gap-3 rounded-2xl border border-[#dfe4d6] bg-[#f4f7ef] p-4 text-sm leading-5 text-[#56604f]">
+          <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-[#6b7f35]" aria-hidden="true" />
+          <p>Acceso protegido para administración y el área legal de Condominio Rústico Capulí.</p>
+        </div>
+      </div>
+    </main>
   </div>;
 
   const navigation = <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#dfe4d6] bg-white px-4 py-3 shadow-sm">

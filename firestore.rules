@@ -47,7 +47,48 @@ service cloud.firestore {
     match /users/{uid} {
       allow get: if admin() || (active() && request.auth.uid == uid);
       allow list: if admin();
-      allow create, update, delete: if admin();
+      allow create: if admin() && request.resource.data.role in ['admin', 'pagos', 'boletas', 'legal', 'consulta'];
+      allow update: if admin() && request.auth.uid != uid && request.resource.data.role in ['admin', 'pagos', 'boletas', 'legal', 'consulta'];
+      allow delete: if false;
+    }
+    match /userEvents/{eventId} {
+      allow get, list: if admin();
+      allow create: if admin()
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorEmail == request.auth.token.email
+        && request.resource.data.targetUid is string
+        && request.resource.data.action in ['crear', 'rol', 'suspender', 'reactivar', 'eliminar']
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /limaSales/{saleId} {
+      allow get, list: if admin();
+      allow create: if admin()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.paid == false
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && existsAfter(/databases/$(database)/documents/salesEvents/$(request.resource.data.lastAuditId))
+        && getAfter(/databases/$(database)/documents/salesEvents/$(request.resource.data.lastAuditId)).data.saleId == saleId;
+      allow update: if admin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paid', 'updatedAt', 'updatedBy', 'lastAuditId'])
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.paid != resource.data.paid
+        && existsAfter(/databases/$(database)/documents/salesEvents/$(request.resource.data.lastAuditId))
+        && getAfter(/databases/$(database)/documents/salesEvents/$(request.resource.data.lastAuditId)).data.saleId == saleId;
+      allow delete: if false;
+    }
+    match /salesEvents/{eventId} {
+      allow get, list: if admin();
+      allow create: if admin()
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorEmail == request.auth.token.email
+        && request.resource.data.action in ['crear', 'pagado', 'pendiente']
+        && request.resource.data.createdAt == request.time
+        && existsAfter(/databases/$(database)/documents/limaSales/$(request.resource.data.saleId))
+        && getAfter(/databases/$(database)/documents/limaSales/$(request.resource.data.saleId)).data.lastAuditId == eventId;
+      allow update, delete: if false;
     }
     match /clients/{clientId} {
       allow get, list: if active();
@@ -72,13 +113,15 @@ service cloud.firestore {
     match /minutes/{minuteId} {
       allow get, list: if legal();
       allow create: if legal()
-        && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientId))
+        && (request.resource.data.clientId == '' || exists(/databases/$(database)/documents/clients/$(request.resource.data.clientId)))
+        && (admin() || request.resource.data.draft.installments == 30)
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.status == 'borrador'
         && minuteAuditMatches(minuteId, request.resource.data.clientId, 'minuta_crear', request.resource.data.lastAuditId);
       allow update: if legal()
         && request.resource.data.clientId == resource.data.clientId
+        && (admin() || request.resource.data.draft.installments == resource.data.draft.installments)
         && request.resource.data.createdBy == resource.data.createdBy
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.lastAuditId != resource.data.lastAuditId
@@ -90,7 +133,7 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /auditLogs/{auditId} {
-      allow get, list: if admin();
+      allow get, list: if admin() || (legal() && resource.data.action in ['minuta_crear', 'minuta_actualizar', 'minuta_generar']);
       allow create: if active()
         && request.resource.data.actorUid == request.auth.uid
         && request.resource.data.actorEmail == request.auth.token.email

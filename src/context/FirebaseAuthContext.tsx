@@ -48,6 +48,7 @@ const demoAccounts: Record<UserRole, { username: string; email: string }> = {
   pagos: { username: 'Pagos de muestra', email: 'pagos@capuli.example' },
   boletas: { username: 'Boletas de muestra', email: 'boletas@capuli.example' },
   legal: { username: 'Legal de muestra', email: 'legal@capuli.example' },
+  consulta: { username: 'Consulta de muestra', email: 'consulta@capuli.example' },
 };
 
 interface Client {
@@ -221,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const profile = await getDoc(doc(db, 'users', firebaseUser.uid));
           const data = profile.data();
           if (profile.exists() && data?.active === true &&
-              ['admin', 'pagos', 'boletas', 'legal'].includes(data.role)) {
+              ['admin', 'pagos', 'boletas', 'legal', 'consulta'].includes(data.role)) {
             setUser({
               id: firebaseUser.uid,
               username: data.name || firebaseUser.email || 'Usuario',

@@ -12,7 +12,11 @@ El proyecto nació de la estructura funcional usada en otros controles, pero no 
 - Constancia de no adeudo desde Clientes, habilitada cuando todas las cuotas registradas están pagadas.
 - Borrador de resolución dentro de Atrasados, habilitado al registrar tres o más cuotas vencidas e impagas. Genera un PDF para revisión; no modifica el contrato ni envía notificaciones.
 - Minutas integradas con expedientes, borradores en Firestore y descarga Word para revisión legal.
-- Roles `admin`, `pagos`, `boletas` y `legal`.
+- Minutas independientes del registro de Clientes, con DNI, carné de extranjería o pasaporte; pagos en Interbank y BBVA; 30 cuotas predeterminadas y cierre con espacios de firma en cada hoja.
+- Historial detallado de modificaciones de cada minuta y acceso adicional de Minutas verificado en Firebase Authentication.
+- Registro administrativo de vendedores de Lima, contratos y pagos semanales.
+- Gestión de usuarios con correo interno `@condominiorusticocapuli.com`, roles, suspensión y actividad.
+- Roles `admin`, `pagos`, `boletas`, `legal` y `consulta`.
 - Historial de cambios visible solo para `admin`, con usuario, fecha, acción y cliente afectado.
 - Reglas de Firestore y Storage que aplican los permisos también en el servidor.
 - Vista local de demostración con datos ficticios, sin conexión a Firebase.

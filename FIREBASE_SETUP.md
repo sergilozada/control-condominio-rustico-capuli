@@ -85,6 +85,9 @@ Por cada persona:
 | `pagos` | Registrar pagos y gestionar vouchers |
 | `boletas` | Gestionar boletas |
 | `legal` | Minutas y borradores de resolución |
+| `consulta` | Consulta de clientes sin permisos de edición |
+
+La sección Usuarios crea accesos con el dominio interno `@condominiorusticocapuli.com`. La cuenta de verificación adicional de Minutas es `minutas@condominiorusticocapuli.com` y no debe tener documento en `users/{UID}`; no inicia sesión en el control ni tiene acceso a datos. Su contraseña se administra en Firebase Authentication y no se almacena en el repositorio.
 
 Para suspender a alguien sin borrar evidencia, cambia `active` a `false`.
 

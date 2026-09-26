@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { FileDown, FilePlus2, Home, LockKeyhole, LogOut, Save, Search, UserRoundPlus } from 'lucide-react';
+import { collection, onSnapshot, query, where, type Timestamp } from 'firebase/firestore';
+import { FileDown, FilePlus2, History, Home, LockKeyhole, LogOut, Save, Search, UserRoundPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/FirebaseAuthContext';
 import { db } from '@/services/firebase';
@@ -13,7 +12,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { createMinute, updateMinute } from './minuteStore';
-import { blankBuyer, blankMinute, buildSchedule, money, validateMinute, type InitialPayment, type MinuteBuyer, type MinuteDraft, type MinuteRecord } from './types';
+import { unlockMinutes } from './minuteAccess';
+import { blankBuyer, blankMinute, buildSchedule, documentLabel, money, validateMinute, type InitialPayment, type MinuteBuyer, type MinuteDraft, type MinuteRecord } from './types';
+
+interface MinuteEvent { id: string; minuteId: string; actorEmail: string; action: string; fields: string[]; summary?: string; createdAt?: Timestamp }
 
 const field = 'h-10 rounded-xl border-[#dfe3d8] bg-white';
 const today = () => {
@@ -35,6 +37,7 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   const [loginError, setLoginError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [minuteEvents, setMinuteEvents] = useState<MinuteEvent[]>([]);
   const prefilledClient = useRef<string | null>(null);
   const selectedClient = clients.find(client => client.id === draft.clientId);
   const schedule = draft.firstDueDate && draft.totalPrice > draft.initialAmount && draft.installments > 0 && draft.installments <= 240
@@ -49,6 +52,14 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
     }, () => setLoadError('No se pudieron cargar las minutas. Revisa la conexión y los permisos.'));
   }, [preview, user, unlocked]);
 
+  useEffect(() => {
+    if (preview || !unlocked || !canManageMinutes(user?.role)) return;
+    return onSnapshot(query(collection(db, 'auditLogs'), where('action', 'in', ['minuta_crear', 'minuta_actualizar', 'minuta_generar'])), snapshot => {
+      setMinuteEvents(snapshot.docs.map(item => ({ id: item.id, ...item.data() } as MinuteEvent))
+        .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)));
+    }, () => setLoadError('No se pudo cargar el historial de Minutas.'));
+  }, [preview, unlocked, user?.role]);
+
   const fillFromClient = (clientId: string) => {
     const client = clients.find(item => item.id === clientId);
     if (!client) return;
@@ -61,7 +72,7 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
       buyers: buyerList.length ? buyerList : [blankBuyer()],
       block: client.manzana, lot: client.lote, area: client.metraje,
       totalPrice: client.montoTotal, initialAmount: client.inicial || 0,
-      installments: client.numeroCuotas || 12,
+      installments: user?.role === 'admin' ? (client.numeroCuotas || 30) : 30,
       firstDueDate: firstRegular?.vencimiento || '',
     });
     setEditingId(null);
@@ -69,7 +80,7 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   };
 
   useEffect(() => {
-    const requested = initialClientId || clients[0]?.id;
+    const requested = initialClientId;
     if (requested && prefilledClient.current !== requested && clients.some(client => client.id === requested)) fillFromClient(requested);
     // Se aplica solo cuando cambia la solicitud de cliente, no durante la edición del formulario.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,12 +95,12 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   }));
 
   const saveDraft = async (): Promise<string | null> => {
-    if (!draft.clientId || !selectedClient) { toast.error('Selecciona un cliente.'); return null; }
+    const buyerName = draft.buyers.map(buyer => buyer.name.trim()).filter(Boolean).join(' y ') || 'Comprador pendiente';
     if (preview) {
       const id = editingId || crypto.randomUUID();
       const item: MinuteRecord = {
         id, reference: `CRC-MUESTRA-${id.slice(0, 4).toUpperCase()}`, clientId: draft.clientId,
-        clientName: getClientDisplayName(selectedClient), status: 'borrador', draft,
+        clientName: buyerName, status: 'borrador', draft,
         createdBy: 'demo', updatedBy: 'demo',
       };
       setRecords(current => [item, ...current.filter(record => record.id !== id)]);
@@ -103,7 +114,7 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
       toast.success('Borrador actualizado');
       return editingId;
     }
-    const id = await createMinute(firebaseUser, draft, getClientDisplayName(selectedClient));
+    const id = await createMinute(firebaseUser, draft, buyerName);
     setEditingId(id);
     toast.success('Borrador guardado');
     return id;
@@ -123,9 +134,9 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
     try {
       const { createMinuteDocument } = await import('./minuteDocument');
       const blob = await createMinuteDocument(draft);
-      if (!preview && firebaseUser && canManageMinutes(user?.role) && unlocked && selectedClient) {
+      if (!preview && firebaseUser && canManageMinutes(user?.role) && unlocked) {
         let id = editingId;
-        if (!id) id = await createMinute(firebaseUser, draft, getClientDisplayName(selectedClient));
+        if (!id) id = await createMinute(firebaseUser, draft, draft.buyers.map(buyer => buyer.name.trim()).join(' y '));
         await updateMinute(firebaseUser, id, draft, 'minuta_generar');
         setEditingId(id);
       }
@@ -155,13 +166,13 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
     setLoginBusy(true);
     setLoginError('');
     try {
-      await reauthenticateWithCredential(firebaseUser, EmailAuthProvider.credential(firebaseUser.email, password));
+      await unlockMinutes(password);
       setPassword('');
       setUnlocked(true);
       setWorkspaceView(initialClientId ? 'records' : 'home');
     } catch (error) {
       console.error('No se pudo abrir Minutas:', error);
-      setLoginError('No se pudo verificar la contraseña de esta cuenta.');
+      setLoginError('No se pudo verificar la contraseña de Minutas.');
     } finally { setLoginBusy(false); }
   };
 
@@ -219,17 +230,17 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
         </div>
         <p className="mt-7 text-xs font-bold uppercase tracking-[0.2em] text-[#6b7f35]">Acceso interno</p>
         <h2 id="minute-login-title" className="brand-display mt-3 text-4xl font-medium leading-tight text-[#17250c]">Ingresar a Minutas</h2>
-        <p className="mt-3 text-base leading-6 text-[#667060]">Verifica nuevamente la contraseña de tu cuenta autorizada.</p>
+        <p className="mt-3 text-base leading-6 text-[#667060]">Ingresa la contraseña de Minutas para abrir esta área.</p>
 
         <form onSubmit={event => void handleLogin(event)} className="mt-9 space-y-5">
           {!preview && <>
             <div className="space-y-2">
-              <Label htmlFor="minute-email" className="text-sm font-semibold text-[#17250c]">Correo corporativo</Label>
+              <Label htmlFor="minute-email" className="text-sm font-semibold text-[#17250c]">Cuenta con acceso</Label>
               <Input id="minute-email" type="email" value={firebaseUser?.email || ''} readOnly autoComplete="username" className="min-h-12 rounded-xl border-[#d9ddd2] bg-[#f7f6f0] px-4 text-base text-[#56604f]" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minute-password" className="text-sm font-semibold text-[#17250c]">Contraseña</Label>
-              <Input id="minute-password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="Ingresa tu contraseña" className="min-h-12 rounded-xl border-[#cfd5c7] bg-white px-4 text-base focus-visible:ring-[#6b7f35]" required />
+              <Label htmlFor="minute-password" className="text-sm font-semibold text-[#17250c]">Contraseña de Minutas</Label>
+              <Input id="minute-password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="off" placeholder="Ingresa la contraseña de Minutas" className="min-h-12 rounded-xl border-[#cfd5c7] bg-white px-4 text-base focus-visible:ring-[#6b7f35]" required />
             </div>
           </>}
           {loginError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{loginError}</p>}
@@ -259,8 +270,8 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
   if (workspaceView === 'home') return <div className="space-y-5">{navigation}
     <section className="relative overflow-hidden rounded-3xl bg-[#2f4817] p-8 text-white shadow-lg sm:p-12" style={{ backgroundImage: 'linear-gradient(90deg, #17250cf5, #5b3b15d9)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#eadca4]">Condominio Rústico Capulí</p>
-      <h2 className="brand-display mt-4 max-w-xl text-4xl">Convierte los datos del cliente en un borrador de minuta.</h2>
-      <p className="mt-3 max-w-xl text-sm leading-6 text-white/80">Completa compradores, verifica importes y genera un Word de trabajo para revisión legal.</p>
+      <h2 className="brand-display mt-4 max-w-xl text-4xl">Crea una minuta desde cero.</h2>
+      <p className="mt-3 max-w-xl text-sm leading-6 text-white/80">Registra compradores, verifica importes y genera un Word de trabajo para revisión legal.</p>
       <Button className="mt-6 bg-[#eadca4] text-[#172012] hover:bg-white" onClick={() => { setEditingId(null); setDraft(blankMinute()); setWorkspaceView('records'); }}><FilePlus2 className="h-4 w-4" /> Crear nueva minuta</Button>
     </section>
     <div className="grid gap-4 sm:grid-cols-2"><Card><CardHeader><CardTitle>{records.length} minutas guardadas</CardTitle></CardHeader><CardContent><Button variant="outline" onClick={() => setWorkspaceView('records')}>Ver expedientes</Button></CardContent></Card><Card><CardHeader><CardTitle>Documento para revisión</CardTitle></CardHeader><CardContent className="text-sm text-[#667060]">Cada Word requiere comprobación de datos y una plantilla contractual aprobada.</CardContent></Card></div>
@@ -289,15 +300,16 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
         </CardContent>
       </Card>
       <Card className="min-w-0 border-[#dfe3d8] bg-[#fffefa]">
-        <CardHeader className="border-b border-[#e8eadf]"><CardTitle>{editingId ? 'Editar borrador' : 'Nueva minuta'}</CardTitle><p className="text-sm text-[#667060]">Los datos del cliente se cargan como punto de partida. Verifica cada campo antes de generar el Word.</p></CardHeader>
+        <CardHeader className="border-b border-[#e8eadf]"><CardTitle>{editingId ? 'Editar borrador' : 'Nueva minuta'}</CardTitle><p className="text-sm text-[#667060]">Registra los datos directamente. Si abriste Minutas desde un cliente, sus datos aparecen como punto de partida.</p></CardHeader>
         <CardContent className="space-y-7 pt-6">
           <section className="space-y-4">
             <h2 className="text-lg font-semibold text-[#17250c]">1. Cliente y compradores</h2>
-            <div className="space-y-2"><Label htmlFor="minute-client">Cliente del control</Label><select id="minute-client" value={draft.clientId} onChange={event => fillFromClient(event.target.value)} className={`w-full border px-3 ${field}`}><option value="">Seleccionar cliente</option>{clients.map(client => <option key={client.id} value={client.id}>{getClientDisplayName(client)} · Mz. {client.manzana} Lote {client.lote}</option>)}</select></div>
+            {selectedClient && <p className="rounded-xl bg-[#f4f7ef] px-4 py-2 text-sm text-[#2f4817]">Datos cargados de {getClientDisplayName(selectedClient)}. Puedes editarlos en esta minuta.</p>}
             {draft.buyers.map((buyer, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e5e7df] bg-[#f8f5eb] p-4 md:grid-cols-2">
               <div className="md:col-span-2 flex items-center justify-between"><h3 className="font-semibold text-[#17250c]">Comprador {index + 1}</h3>{draft.buyers.length > 1 && canEdit && <Button size="sm" variant="ghost" onClick={() => setValue('buyers', draft.buyers.filter((_, i) => i !== index))}>Quitar</Button>}</div>
               <div><Label>Nombre completo</Label><Input value={buyer.name} onChange={event => setBuyer(index, 'name', event.target.value)} disabled={!canEdit} className={field} /></div>
-              <div><Label>DNI</Label><Input value={buyer.document} onChange={event => setBuyer(index, 'document', event.target.value)} maxLength={8} disabled={!canEdit} className={field} /></div>
+              <div><Label>Tipo de documento</Label><select value={buyer.documentType || 'dni'} onChange={event => { const type = event.target.value as MinuteBuyer['documentType']; setDraft(current => ({ ...current, buyers: current.buyers.map((item, i) => i === index ? { ...item, documentType: type, document: '' } : item) })); }} disabled={!canEdit} className={`w-full border px-3 ${field}`}><option value="dni">DNI</option><option value="ce">Carné de extranjería</option><option value="pasaporte">Pasaporte</option></select></div>
+              <div><Label>{documentLabel(buyer.documentType)} {buyer.documentType === 'pasaporte' ? '(hasta 15 caracteres)' : buyer.documentType === 'ce' ? '(hasta 11 dígitos)' : '(8 dígitos)'}</Label><Input value={buyer.document} onChange={event => setBuyer(index, 'document', event.target.value.toUpperCase().replace(buyer.documentType === 'pasaporte' ? /[^A-Z0-9]/g : /\D/g, ''))} inputMode={buyer.documentType === 'pasaporte' ? 'text' : 'numeric'} maxLength={buyer.documentType === 'pasaporte' ? 15 : buyer.documentType === 'ce' ? 11 : 8} disabled={!canEdit} className={field} /></div>
               <div><Label>Ocupación</Label><Input value={buyer.occupation} onChange={event => setBuyer(index, 'occupation', event.target.value)} disabled={!canEdit} className={field} /></div>
               <div><Label>Estado civil</Label><Input value={buyer.maritalStatus} onChange={event => setBuyer(index, 'maritalStatus', event.target.value)} disabled={!canEdit} className={field} /></div>
               <div className="md:col-span-2"><Label>Domicilio</Label><Input value={buyer.address} onChange={event => setBuyer(index, 'address', event.target.value)} disabled={!canEdit} className={field} /></div>
@@ -319,9 +331,10 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
           <section className="space-y-4 border-t border-[#e8eadf] pt-6">
             <h2 className="text-lg font-semibold text-[#17250c]">3. Pagos de inicial</h2>
             <p className="text-sm text-[#667060]">Registra solo pagos verificados. La suma debe coincidir con la cuota inicial para generar el Word.</p>
-            {draft.initialPayments.map((payment, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e5e7df] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
+            {draft.initialPayments.map((payment, index) => <div key={index} className="grid gap-3 rounded-xl border border-[#e5e7df] p-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr_auto]">
               <div><Label>Fecha</Label><Input type="date" value={payment.date} onChange={event => setPayment(index, 'date', event.target.value)} disabled={!canEdit} className={field} /></div>
-              <div><Label>Medio</Label><select value={payment.method} onChange={event => setPayment(index, 'method', event.target.value)} disabled={!canEdit} className={`w-full border px-3 ${field}`}><option value="">Seleccionar</option>{['Yape', 'Plin', 'Depósito', 'Transferencia', 'Otro'].map(method => <option key={method} value={method}>{method}</option>)}</select></div>
+              <div><Label>Medio</Label><select value={payment.method} onChange={event => setDraft(current => ({ ...current, initialPayments: current.initialPayments.map((item, i) => i === index ? { ...item, method: event.target.value, bank: ['Depósito', 'Transferencia'].includes(event.target.value) ? item.bank : '' } : item) }))} disabled={!canEdit} className={`w-full border px-3 ${field}`}><option value="">Seleccionar</option>{['Yape', 'Plin', 'Depósito', 'Transferencia', 'Otro'].map(method => <option key={method} value={method}>{method}</option>)}</select></div>
+              <div><Label>Banco</Label><select value={payment.bank || ''} onChange={event => setPayment(index, 'bank', event.target.value)} disabled={!canEdit || !['Depósito', 'Transferencia'].includes(payment.method)} className={`w-full border px-3 ${field}`}><option value="">Seleccionar</option><option value="Interbank">Interbank</option><option value="BBVA">BBVA</option></select></div>
               <div><Label>Monto S/</Label><Input type="number" min={0} step="0.01" value={payment.amount || ''} onChange={event => setPayment(index, 'amount', Number(event.target.value))} disabled={!canEdit} className={field} /></div>
               {canEdit && <Button size="sm" variant="ghost" className="self-end" onClick={() => setValue('initialPayments', draft.initialPayments.filter((_, i) => i !== index))}>Quitar</Button>}
             </div>)}
@@ -330,14 +343,16 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
           </section>
           <section className="space-y-4 border-t border-[#e8eadf] pt-6">
             <h2 className="text-lg font-semibold text-[#17250c]">4. Financiamiento y revisión</h2>
-            <div className="grid gap-3 sm:grid-cols-2"><div><Label>Número total de cuotas</Label><Input type="number" min={1} max={240} value={draft.installments || ''} onChange={event => setValue('installments', Number(event.target.value))} disabled={!canEdit} className={field} /></div><div><Label>Primera fecha de vencimiento</Label><Input type="date" value={draft.firstDueDate} onChange={event => setValue('firstDueDate', event.target.value)} disabled={!canEdit} className={field} /></div></div>
-            {schedule.length > 0 && <div className="max-h-64 overflow-y-auto rounded-xl border border-[#dfe3d8]"><table className="w-full text-sm"><thead className="sticky top-0 bg-[#f8f5eb] text-[#17250c]"><tr><th className="p-2 text-left">Cuota</th><th className="p-2 text-left">Vencimiento</th><th className="p-2 text-right">Monto</th></tr></thead><tbody>{schedule.map(item => <tr key={item.number} className="border-t"><td className="p-2">{item.number}</td><td className="p-2">{formatDate(item.dueDate)}</td><td className="p-2 text-right">{money(item.amount)}</td></tr>)}</tbody></table></div>}
+            <div className="grid gap-3 sm:grid-cols-2"><div><Label>Número total de cuotas</Label><Input type="number" min={1} max={240} value={draft.installments || ''} onChange={event => setValue('installments', Number(event.target.value))} disabled={!canEdit || user?.role !== 'admin'} className={field} /><p className="mt-1 text-xs text-[#667060]">30 cuotas predeterminadas. Solo administración puede cambiar esta cantidad.</p></div><div><Label>Primera fecha de vencimiento</Label><Input type="date" value={draft.firstDueDate} onChange={event => setValue('firstDueDate', event.target.value)} disabled={!canEdit} className={field} /></div></div>
+            {schedule.length > 0 && <div className="max-h-64 overflow-y-auto rounded-xl border border-[#dfe3d8]"><table className="w-full text-sm"><thead className="sticky top-0 bg-[#f8f5eb] text-[#17250c]"><tr><th className="p-2 text-left">Comprador</th><th className="p-2 text-left">Vencimiento</th><th className="p-2 text-right">Monto</th></tr></thead><tbody>{schedule.map(item => <tr key={item.number} className="border-t"><td className="p-2">{draft.buyers.map(buyer => buyer.name).filter(Boolean).join(' y ') || 'Comprador'}</td><td className="p-2">{formatDate(item.dueDate)}</td><td className="p-2 text-right">{money(item.amount)}</td></tr>)}</tbody></table></div>}
             <div><Label>Observaciones para revisión del documento</Label><Textarea value={draft.notes} onChange={event => setValue('notes', event.target.value)} disabled={!canEdit} rows={3} className="mt-2" /></div>
+            <div className="space-y-3 border-t border-[#e8eadf] pt-5"><h2 className="text-lg font-semibold text-[#17250c]">5. Cierre y firmas</h2><div className="grid gap-3 sm:grid-cols-3"><div><Label>Lugar de firma</Label><Input value={draft.signaturePlace || ''} onChange={event => setValue('signaturePlace', event.target.value)} disabled={!canEdit} placeholder="Ej. Lima" className={field} /></div><div><Label>Fecha de firma</Label><Input type="date" value={draft.signatureDate || ''} onChange={event => setValue('signatureDate', event.target.value)} disabled={!canEdit} className={field} /></div><div><Label>Representante de Gerencia</Label><Input value={draft.managerName || ''} onChange={event => setValue('managerName', event.target.value)} disabled={!canEdit} placeholder="Nombre completo" className={field} /></div></div></div>
             <div className="flex flex-wrap gap-3 border-t border-[#e8eadf] pt-5">
               {canEdit && <Button variant="outline" disabled={busy} onClick={() => void handleSave()}><Save className="h-4 w-4" /> Guardar borrador</Button>}
               <Button disabled={busy} onClick={() => void handleGenerate()} className="bg-[#2f4817] text-white hover:bg-[#17250c]"><FileDown className="h-4 w-4" /> Generar Word para revisión</Button>
             </div>
           </section>
+          {editingId && <section className="space-y-3 border-t border-[#e8eadf] pt-6"><h2 className="flex items-center gap-2 text-lg font-semibold text-[#17250c]"><History className="h-5 w-5" /> Historial de esta minuta</h2>{minuteEvents.filter(event => event.minuteId === editingId).length === 0 ? <p className="text-sm text-[#667060]">Aún no hay cambios registrados.</p> : minuteEvents.filter(event => event.minuteId === editingId).map(event => <div key={event.id} className="rounded-xl border border-[#dfe3d8] bg-white p-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><strong>{event.actorEmail}</strong><time className="text-[#667060]">{event.createdAt?.toDate().toLocaleString('es-PE') || 'Pendiente'}</time></div><p className="mt-1 text-[#56604f]">{event.summary || event.action}</p><p className="text-xs text-[#667060]">{event.fields.join(', ')}</p></div>)}</section>}
         </CardContent>
       </Card>
     </div>

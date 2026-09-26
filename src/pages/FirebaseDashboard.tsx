@@ -16,6 +16,7 @@ import {
   FileText,
   Home,
   History,
+  HandCoins,
   LogOut,
   Plus,
   Search,
@@ -30,6 +31,8 @@ import StatsView from '@/components/StatsView';
 import MinutaUploadButton from '@/components/MinutaUploadButton';
 import { MinutasWorkspace } from '@/features/minutas';
 import AuditLog from '@/components/AuditLog';
+import StaffUsers from '@/components/StaffUsers';
+import LimaSales from '@/components/LimaSales';
 import type { Titular } from '@/types/client';
 import { getClientDisplayDnis, getClientDisplayName } from '@/types/client';
 import { canManageClients, canManageMinutes, canRegisterPayments, canViewAnalytics, roleLabel, type UserRole } from '@/config/permissions';
@@ -79,6 +82,8 @@ const menuItems = [
   { id: 'atrasados', label: 'Atrasados', description: 'Pagos vencidos', icon: AlertTriangle },
   { id: 'minutas', label: 'Minutas', description: 'Contratos y cronogramas', icon: FileSignature },
   { id: 'auditoria', label: 'Historial', description: 'Cambios de usuarios', icon: History },
+  { id: 'vendedores', label: 'Vendedores Lima', description: 'Ventas y pagos semanales', icon: HandCoins },
+  { id: 'usuarios', label: 'Usuarios', description: 'Equipo y permisos', icon: Users },
 ];
 
 export default function FirebaseDashboard({ demo = false }: { demo?: boolean }) {
@@ -271,7 +276,7 @@ export default function FirebaseDashboard({ demo = false }: { demo?: boolean }) 
           >
               <TabsList aria-label="Secciones del panel" className="flex h-auto w-full flex-col justify-start gap-1 overflow-visible bg-transparent p-0">
                 {menuItems.filter(item => {
-                  if (['proyeccion', 'estadisticas', 'reporte', 'auditoria'].includes(item.id)) return canViewAnalytics(user?.role);
+                  if (['proyeccion', 'estadisticas', 'reporte', 'auditoria', 'vendedores', 'usuarios'].includes(item.id)) return canViewAnalytics(user?.role);
                   if (item.id === 'minutas') return canManageMinutes(user?.role);
                   if (item.id === 'pendientes') return canRegisterPayments(user?.role);
                   if (item.id === 'atrasados') return canRegisterPayments(user?.role) || canManageMinutes(user?.role);
@@ -457,6 +462,8 @@ export default function FirebaseDashboard({ demo = false }: { demo?: boolean }) 
           <TabsContent value="clientes" className="vh-tab-enter mt-0"><ClientList onCreateMinute={createMinuteForClient} /></TabsContent>
           {canManageMinutes(user?.role) && <TabsContent value="minutas" className="vh-tab-enter mt-0"><MinutasWorkspace initialClientId={minuteClientId} /></TabsContent>}
           {user?.role === 'admin' && <TabsContent value="auditoria" className="vh-tab-enter mt-0"><AuditLog /></TabsContent>}
+          {user?.role === 'admin' && <TabsContent value="vendedores" className="vh-tab-enter mt-0"><LimaSales /></TabsContent>}
+          {user?.role === 'admin' && <TabsContent value="usuarios" className="vh-tab-enter mt-0"><StaffUsers /></TabsContent>}
           {canViewAnalytics(user?.role) && <TabsContent value="proyeccion" className="vh-tab-enter mt-0"><ProjectionView /></TabsContent>}
           {canViewAnalytics(user?.role) && <TabsContent value="estadisticas" className="vh-tab-enter mt-0"><StatsView /></TabsContent>}
           {canViewAnalytics(user?.role) && <TabsContent value="reporte" className="vh-tab-enter mt-0"><StatsView showReport /></TabsContent>}

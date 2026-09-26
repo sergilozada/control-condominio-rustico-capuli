@@ -134,12 +134,6 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
     try {
       const { createMinuteDocument } = await import('./minuteDocument');
       const blob = await createMinuteDocument(draft);
-      if (!preview && firebaseUser && canManageMinutes(user?.role) && unlocked) {
-        let id = editingId;
-        if (!id) id = await createMinute(firebaseUser, draft, draft.buyers.map(buyer => buyer.name.trim()).join(' y '));
-        await updateMinute(firebaseUser, id, draft, 'minuta_generar');
-        setEditingId(id);
-      }
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
@@ -148,9 +142,25 @@ export default function MinutasWorkspace({ initialClientId }: { initialClientId?
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+
+      if (!preview && firebaseUser && canManageMinutes(user?.role) && unlocked) {
+        try {
+          let id = editingId;
+          if (!id) id = await createMinute(firebaseUser, draft, draft.buyers.map(buyer => buyer.name.trim()).join(' y '));
+          await updateMinute(firebaseUser, id, draft, 'minuta_generar');
+          setEditingId(id);
+        } catch (error) {
+          console.error('El Word se descargó, pero no se pudo guardar la minuta en Firebase:', error);
+          const code = (error as { code?: string })?.code;
+          toast.error(code === 'permission-denied'
+            ? 'El Word se descargó, pero Firebase rechazó guardar la minuta. Revisa los permisos y las reglas de Firestore.'
+            : 'El Word se descargó, pero no se pudo guardar la minuta. Revisa tu conexión y vuelve a intentarlo.');
+          return;
+        }
+      }
       toast.success('Word de trabajo generado para revisión');
     } catch (error) {
-      console.error(error);
+      console.error('No se pudo crear o descargar el Word de la minuta:', error);
       toast.error('No se pudo generar el Word.');
     } finally { setBusy(false); }
   };

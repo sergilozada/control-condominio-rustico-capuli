@@ -57,7 +57,7 @@ export const money = (amount: number) => `S/ ${amount.toLocaleString('es-PE', { 
 export function validateMinute(draft: MinuteDraft): string[] {
   const errors: string[] = [];
   if (!draft.buyers.length || draft.buyers.some(buyer => !buyer.name.trim() || !validBuyerDocument(buyer))) {
-    errors.push('Completa el nombre y un documento válido por comprador: DNI 8 dígitos, carné de extranjería hasta 11 dígitos o pasaporte hasta 15 caracteres.');
+    errors.push('Completa el nombre y documento de cada comprador. El DNI debe tener 8 dígitos.');
   }
   if (!draft.block.trim() || !draft.lot.trim() || !Number.isFinite(draft.area) || draft.area <= 0) errors.push('Completa manzana, lote y área.');
   if (!Number.isFinite(draft.totalPrice) || draft.totalPrice <= 0 || !Number.isFinite(draft.initialAmount) || draft.initialAmount < 0 || draft.initialAmount >= draft.totalPrice) errors.push('Revisa el precio y la cuota inicial.');
@@ -70,10 +70,9 @@ export function validateMinute(draft: MinuteDraft): string[] {
 }
 
 export function validBuyerDocument(buyer: MinuteBuyer): boolean {
-  const value = buyer.document.trim().toUpperCase();
+  const value = buyer.document.trim();
   if ((buyer.documentType || 'dni') === 'dni') return /^\d{8}$/.test(value);
-  if (buyer.documentType === 'ce') return /^\d{1,11}$/.test(value);
-  return /^[A-Z0-9]{1,15}$/.test(value);
+  return value.length > 0;
 }
 
 export const documentLabel = (type?: MinuteBuyer['documentType']) =>
